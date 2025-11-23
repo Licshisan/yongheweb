@@ -1,21 +1,59 @@
 import { useEffect, useState } from "react";
-import { Typography, Space, message, Input, Checkbox, Table, Button } from "antd";
+import { Typography, Space, message, Input, Table, Button, Popconfirm, TableColumnsType } from "antd";
 
-import { Worker, getWorkers, updateWorker, deleteWorker } from "../../services/workers";
+import { Worker, getWorkers, deleteWorker } from "../../services/worker";
+import { useNavigate } from "react-router-dom";
 
-const { Title } = Typography;
-const { Search } = Input;
+const WorkerListPage = () => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const navigate = useNavigate();
+  const [workers, setWorkers] = useState<Worker[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
-// 定义 WorkerList 的 Props 接口
-interface WorkerListProps {
-  workers: Worker[];
-  onEdit: (worker: Worker) => void;
-  onDelete: (id: number) => void;
-}
+  const loadWorkers = async (search: string = "") => {
+    try {
+      setLoading(true);
+      const result = await getWorkers();
+      if (result.data) {
+        const filteredWorkers = result.data.filter((worker: Worker) =>
+          worker.name.toLowerCase().includes(search.toLowerCase()),
+        );
+        setWorkers(filteredWorkers);
+      }
+    } catch (error: any) {
+      console.error("加载工人失败:", error);
+      messageApi.warning(error.response?.data?.msg || "加载工人失败");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-// WorkerList 组件
-const WorkerList: React.FC<WorkerListProps> = ({ workers, onEdit, onDelete }) => {
-  const columns = [
+  // 处理搜索框输入变化
+  const handleSearch = (value: string) => {
+    loadWorkers(value);
+  };
+
+  // 编辑
+  const handleEdit = (worker: Worker) => {
+    navigate(`/worker/create?id=${worker.id}`);
+  };
+
+  // 删除
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteWorker(id);
+      loadWorkers();
+    } catch (error: any) {
+      console.error("删除工人失败:", error);
+      messageApi.warning(error.response?.data?.msg || "删除工人失败");
+    }
+  };
+  
+  useEffect(() => {
+    loadWorkers();
+  }, []);
+
+  const columns: TableColumnsType<Worker> = [
     {
       title: "姓名",
       dataIndex: "name",
@@ -38,6 +76,16 @@ const WorkerList: React.FC<WorkerListProps> = ({ workers, onEdit, onDelete }) =>
       render: (text: string) => text || "-",
     },
     {
+      title: "是否在职",
+      dataIndex: "status",
+      key: "status",
+      filters: [
+        { text: "在职", value: "在职" },
+        { text: "离职", value: "离职" },
+      ],
+      onFilter: (value, record) => record.status === value,
+    },
+    {
       title: "入职时间",
       dataIndex: "entry_date",
       key: "entry_date",
@@ -49,11 +97,6 @@ const WorkerList: React.FC<WorkerListProps> = ({ workers, onEdit, onDelete }) =>
       render: (text: string | null) => (text ? text : "-"),
     },
     {
-      title: "是否在职",
-      dataIndex: "status",
-      key: "status",
-    },
-    {
       title: "备注",
       dataIndex: "remark",
       key: "remark",
@@ -61,122 +104,31 @@ const WorkerList: React.FC<WorkerListProps> = ({ workers, onEdit, onDelete }) =>
     {
       title: "操作",
       key: "actions",
+      width: 200,
       render: (_: any, record: Worker) => (
         <Space>
-          <Button type="link" onClick={() => onEdit(record)}>
+          <Button type="link" onClick={() => handleEdit(record)}>
             编辑
           </Button>
-          {/* 
-          <Button type="link" danger onClick={() => onDelete(record.id)}>删除</Button>
-          */}
+          <Popconfirm title="确认删除吗？" onConfirm={() => handleDelete(record.id)} okText="确定" cancelText="取消">
+            <Button type="link" danger>
+              删除
+            </Button>
+          </Popconfirm>
         </Space>
       ),
     },
   ];
 
-  return <Table dataSource={workers} columns={columns} rowKey="id" pagination={false} />;
-};
-
-// --- WorkerPage 主组件 ---
-const WorkerPage = () => {
-  const [workers, setWorkers] = useState<Worker[]>([]);
-  const [filteredWorkers, setFilteredWorkers] = useState<Worker[]>([]);
-  const [editing, setEditing] = useState<Worker | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string[]>(["在职"]);
-
-  const loadWorkers = async () => {
-    try {
-      const res = await getWorkers();
-      setWorkers(res.data.workers);
-    } catch (err) {
-      message.error("加载工人信息失败");
-    }
-  };
-
-  useEffect(() => {
-    applyFilters(searchKeyword, statusFilter);
-  }, [workers, searchKeyword, statusFilter]);
-
-  useEffect(() => {
-    loadWorkers();
-  }, []);
-
-  const applyFilters = (keyword: string, statuses: string[]) => {
-    const filtered = workers.filter((worker) => {
-      const matchName = worker.name.toLowerCase().includes((keyword || "").toLowerCase());
-      const matchStatus = statuses.length === 0 || statuses.includes(worker.status || "");
-      return matchName && matchStatus;
-    });
-    setFilteredWorkers(filtered);
-  };
-
-  const handleSearch = (value: string) => {
-    setSearchKeyword(value);
-    applyFilters(value, statusFilter);
-  };
-
-  const handleStatusChange = (checked: string[]) => {
-    setStatusFilter(checked);
-    applyFilters(searchKeyword, checked);
-  };
-
-  const handleSave = async (data: Partial<Worker>) => {
-    if (!editing) return;
-    try {
-      await updateWorker(editing.id, data);
-      message.success("更新成功");
-      setEditing(null);
-      setModalVisible(false);
-      loadWorkers();
-    } catch (err) {
-      message.error("保存失败");
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    try {
-      await deleteWorker(id);
-      message.success("删除成功");
-      loadWorkers();
-    } catch (err) {
-      message.error("删除失败");
-    }
-  };
 
   return (
     <>
-      <Title level={3}>工人信息管理</Title>
-      <Space style={{ marginBottom: 16 }} wrap>
-        <Search
-          placeholder="请输入姓名搜索"
-          onSearch={handleSearch}
-          allowClear
-          style={{ width: 300, marginRight: 50 }}
-        />
-        <Checkbox.Group
-          style={{ marginRight: 16 }}
-          options={[
-            { label: "在职", value: "在职" },
-            { label: "离职", value: "离职" },
-          ]}
-          value={statusFilter}
-          onChange={handleStatusChange}
-        />
-      </Space>
-
-      {/* 直接使用 WorkerList 组件 */}
-      <WorkerList
-        workers={filteredWorkers}
-        onEdit={(w) => {
-          setEditing(w);
-          setModalVisible(true);
-        }}
-        onDelete={handleDelete}
-      />
+      {contextHolder}
+      <Typography.Title level={3}>工人信息管理</Typography.Title>
+      <Input.Search placeholder="请输入姓名搜索" onSearch={handleSearch} style={{ width: 300, marginBottom: 20 }} />
+      <Table loading={loading}  dataSource={workers} columns={columns} rowKey="id" pagination={false} />
     </>
   );
 };
 
-export default WorkerPage;
+export default WorkerListPage;

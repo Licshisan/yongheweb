@@ -1,8 +1,8 @@
 import { EditableProTable, ProColumns, ProFormSelect } from "@ant-design/pro-components";
 import { DatePicker, notification } from "antd";
 import React, { useMemo, useRef, useState, useEffect } from "react";
-import { getWorkers, getWorkersBySearchDate } from "../services/workers";
-import { getProcesses } from "../services/processes";
+import { getWorkers, getWorkersBySearchDate } from "../services/worker";
+import { getProcesses } from "../services/process";
 import { getSpecModels } from "../services/specModel";
 import { updateWageLog, createWageLog, deleteWageLog, getWageLogById, getWageLogsByDate } from "../services/wageLogs";
 import dayjs from "dayjs";
@@ -118,8 +118,10 @@ const WageLogPage: React.FC = () => {
   useEffect(() => {
     const loadProcesses = async () => {
       try {
-        const res = await getProcesses();
-        setProcesses(res.processes);
+        const result = await getProcesses();
+        if(result.data){
+          setProcesses(result.data);
+        }
       } catch (error) {
         console.error("加载工序失败:", error);
       }

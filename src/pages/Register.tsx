@@ -1,4 +1,3 @@
-// src/RegisterPage.tsx
 import { useState } from "react";
 import { Form, Input, Button, message, Flex, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -20,7 +19,7 @@ const RegisterPage = () => {
       form.resetFields();
       messageApi.success("注册成功！请返回登录");
     } catch (error: any) {
-      messageApi.error(error.response?.data?.msg || "注册失败，请稍后再试");
+      messageApi.error(error?.data?.msg || "注册失败，请稍后再试");
     } finally {
       setLoading(false);
     }

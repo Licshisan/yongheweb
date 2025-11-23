@@ -1,23 +1,50 @@
 import React, { useState, useEffect } from "react";
-import { getProcesses, createProcess, updateProcess, deleteProcess, Process } from "../../services/processes";
-import { Button, Table, Modal, Form, Input } from "antd";
+import { getProcesses, deleteProcess, Process } from "../../services/process";
+import { Button, Table, Input, message, Popconfirm, Typography, TableColumnsType } from "antd";
+import { useNavigate } from "react-router-dom";
 
-const ProcessPage = () => {
+const ProcessListPage = () => {
+  const [messageApi, contextHolder] = message.useMessage();
+  const navigate = useNavigate();
   const [processes, setProcesses] = useState<Process[]>([]);
-  const [editing, setEditing] = useState<Process | null>(null);
-  const [showForm, setShowForm] = useState(false);
-  const [searchTerm, setSearchTerm] = useState<string>(""); // 用于存储搜索框的值
+  const [loading, setLoading] = useState<boolean>(false);
 
   const loadProcesses = async (search: string = "") => {
     try {
-      const res = await getProcesses();
-      // 如果有搜索条件，过滤结果
-      const filteredProcesses = res.processes.filter((process: Process) =>
-        process.name.toLowerCase().includes(search.toLowerCase()),
-      );
-      setProcesses(filteredProcesses);
-    } catch (error) {
+      setLoading(true);
+      const result = await getProcesses();
+      if (result.data) {
+        const filteredProcesses = result.data.filter((process: Process) =>
+          process.name.toLowerCase().includes(search.toLowerCase()),
+        );
+        setProcesses(filteredProcesses);
+      }
+    } catch (error: any) {
       console.error("加载工序失败:", error);
+      messageApi.warning(error.response?.data?.msg || "加载工序失败，请稍后再试。");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 处理搜索框输入变化
+  const handleSearch = (value: string) => {
+    loadProcesses(value);
+  };
+
+  // 编辑工序
+  const handleEdit = (process: Process) => {
+    navigate(`/process/create?id=${process.id}`);
+  };
+
+  // 删除工序
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteProcess(id);
+      loadProcesses();
+    } catch (error: any) {
+      console.error("删除工序失败:", error);
+      messageApi.warning(error.response?.data?.msg || "删除工序失败");
     }
   };
 
@@ -25,44 +52,12 @@ const ProcessPage = () => {
     loadProcesses();
   }, []);
 
-  // 处理搜索框输入变化
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    loadProcesses(value); // 根据输入的内容过滤工序列表
-  };
-
-  // 保存或更新工序
-  const handleSave = async (values: Process) => {
-    try {
-      if (editing) {
-        await updateProcess(editing.id, values);
-      } else {
-        await createProcess(values);
-      }
-      setEditing(null);
-      setShowForm(false);
-      loadProcesses(); // 更新工序列表
-    } catch (error) {
-      console.error("保存工序失败:", error);
-    }
-  };
-
-  // 删除工序
-  const handleDelete = async (id: number) => {
-    try {
-      await deleteProcess(id);
-      loadProcesses(); // 更新工序列表
-    } catch (error) {
-      console.error("删除工序失败:", error);
-    }
-  };
-
-  const columns = [
+  const columns: TableColumnsType<Process> = [
     {
       title: "工序名称",
       dataIndex: "name",
       key: "name",
+      width: 300,
     },
     {
       title: "描述",
@@ -72,102 +67,30 @@ const ProcessPage = () => {
     {
       title: "操作",
       key: "actions",
+      width: 200,
       render: (_: any, record: Process) => (
-        <div>
+        <>
           <Button type="link" onClick={() => handleEdit(record)}>
             编辑
           </Button>
-          <Button type="link" danger onClick={() => handleDelete(record.id)}>
-            删除
-          </Button>
-        </div>
+          <Popconfirm title="确认删除吗？" onConfirm={() => handleDelete(record.id)} okText="确定" cancelText="取消">
+            <Button type="link" danger>
+              删除
+            </Button>
+          </Popconfirm>
+        </>
       ),
     },
   ];
 
-  const handleEdit = (process: Process) => {
-    setEditing(process);
-    setShowForm(true);
-  };
-
-  const handleCancel = () => {
-    setEditing(null);
-    setShowForm(false);
-  };
-
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">工序信息管理</h1>
-
-      {/* 搜索框 */}
-      <Input
-        placeholder="搜索工序名称"
-        value={searchTerm}
-        onChange={handleSearchChange}
-        style={{ width: 300, marginBottom: 20 }}
-      />
-
-      <Table
-        dataSource={processes}
-        columns={columns}
-        rowKey="id"
-        pagination={false} // 去掉分页
-      />
-
-      {/* 工序表单 */}
-      <Modal title={editing ? "编辑工序" : "新增工序"} visible={showForm} onCancel={handleCancel} footer={null}>
-        <ProcessForm
-          initialData={editing || { id: 0, name: "", description: "" }} // Fix: add id to the default object
-          onSave={handleSave}
-          onCancel={handleCancel}
-        />
-      </Modal>
-    </div>
+    <>
+      {contextHolder}
+      <Typography.Title level={3}>工序信息管理</Typography.Title>
+      <Input.Search placeholder="搜索工序名称" onSearch={handleSearch} style={{ width: 300, marginBottom: 20 }} />
+      <Table loading={loading} dataSource={processes} columns={columns} rowKey="id" pagination={false} />
+    </>
   );
 };
 
-// 工序表单组件
-const ProcessForm = ({
-  initialData,
-  onSave,
-  onCancel,
-}: {
-  initialData: Process; // 确保传递的是一个 Process 类型
-  onSave: (data: Process) => void;
-  onCancel: () => void;
-}) => {
-  const [form] = Form.useForm();
-
-  // 设置表单默认值
-  useEffect(() => {
-    form.setFieldsValue({
-      name: initialData.name,
-      description: initialData.description,
-    });
-  }, [initialData, form]);
-
-  const handleFinish = (values: Process) => {
-    onSave(values);
-  };
-
-  return (
-    <Form form={form} initialValues={initialData} onFinish={handleFinish} layout="vertical">
-      <Form.Item label="工序名称" name="name" rules={[{ required: true, message: "请输入工序名称" }]}>
-        <Input />
-      </Form.Item>
-
-      <Form.Item label="描述" name="description" rules={[{ required: true, message: "请输入工序描述" }]}>
-        <Input />
-      </Form.Item>
-
-      <div className="flex justify-end space-x-2">
-        <Button onClick={onCancel}>取消</Button>
-        <Button type="primary" htmlType="submit">
-          保存
-        </Button>
-      </div>
-    </Form>
-  );
-};
-
-export default ProcessPage;
+export default ProcessListPage;

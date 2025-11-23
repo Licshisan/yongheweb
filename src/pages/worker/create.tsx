@@ -1,49 +1,44 @@
-// src/pages/workers/WorkerFormPage.tsx
 import React, { useEffect, useState } from "react";
-import { Form, Input, Select, Button, Space, message, DatePicker, Radio, Card, Typography, Row, Col } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
-import { getProcesses } from "../../services/processes";
-import { createWorker, updateWorker } from "../../services/workers";
+import { Form, Input, Select, Button, message, DatePicker, Radio, Typography, Row, Col } from "antd";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { createWorker, updateWorker, getWorker } from "../../services/worker";
+import { getProcesses } from "../../services/process";
 import dayjs from "dayjs";
 
 const { Option } = Select;
-const { Title } = Typography;
 
-const WorkerFormPage: React.FC = () => {
-  const [form] = Form.useForm();
-  const [processes, setProcesses] = useState<{ id: number; name: string }[]>([]);
-  const [initialData, setInitialData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
+const WorkerCreatePage: React.FC = () => {
+  const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(true);
+  const [processes, setProcesses] = useState<{ id: number; name: string }[]>([]);
+  const status = Form.useWatch("status", form);
+
+  const id = searchParams.get("id");
   const isEditMode = !!id;
 
-  // ... (省略加载数据的 useEffect 和 handleSubmit, handleCancel 函数)
-  // 加载工序列表
-  useEffect(() => {
-    const loadProcesses = async () => {
-      try {
-        const res = await getProcesses();
-        setProcesses(res.processes || []);
-      } catch (error) {
-        console.error("加载工序失败:", error);
-        message.error("加载工序失败");
-      }
-    };
-    loadProcesses();
-  }, []);
-
-  // 如果是编辑模式，加载工人数据
+  // 加载工序数据（如果是编辑模式）
   useEffect(() => {
     if (isEditMode) {
       const loadWorkerData = async () => {
         try {
           setLoading(true);
-        } catch (error) {
-          console.error("加载工人数据失败:", error);
-          message.error("加载工人数据失败，可能该工人已被删除。");
-          navigate("/workers"); // 加载失败则跳回列表页
+          const response = await getWorker(Number(id));
+          if (response.data) {
+            const playload = {
+              ...response.data,
+              entry_date: response.data.entry_date ? dayjs(response.data.entry_date) : null,
+              leave_date: response.data.leave_date ? dayjs(response.data.leave_date) : null,
+            };
+            form.setFieldsValue(playload);
+          } else {
+            messageApi.warning("未找到对应的工人数据");
+          }
+        } catch (error: any) {
+          console.error("加载工人数失败:", error);
+          messageApi.error(error.response?.data?.msg || "加载工人数失败");
         } finally {
           setLoading(false);
         }
@@ -51,57 +46,62 @@ const WorkerFormPage: React.FC = () => {
       loadWorkerData();
     } else {
       setLoading(false);
-      // 新增模式下设置默认状态
-      form.setFieldsValue({ status: "在职" });
     }
-  }, [id, isEditMode, form, navigate]);
+  }, [id, isEditMode, messageApi, form]);
 
-  // 当 initialData 变化时，设置表单值
-  useEffect(() => {
-    if (initialData && !loading) {
-      form.setFieldsValue(initialData);
-    }
-  }, [initialData, loading, form]);
-
-  const status = Form.useWatch("status", form);
-
-  const handleSubmit = async () => {
+  const handleFinish = async (values: any) => {
     try {
-      const values = await form.validateFields();
       const payload = {
         ...values,
         entry_date: values.entry_date ? values.entry_date.format("YYYY-MM-DD") : null,
         leave_date: values.leave_date ? values.leave_date.format("YYYY-MM-DD") : null,
       };
-
-      if (isEditMode) {
+      console.log("提交的工人数据:", payload);
+      if (isEditMode && id) {
         await updateWorker(Number(id), payload);
-        message.success("工人信息更新成功！");
+        messageApi.success("工人更新成功");
       } else {
         await createWorker(payload);
-        message.success("工人创建成功！");
+        messageApi.success("新建工人成功");
       }
-      navigate("/workers"); // 保存成功后跳回工人列表页
-    } catch (err: any) {
-      if (err.errorFields) {
-        message.error("请检查并填写必填项");
-      } else {
-        message.error("操作失败，请稍后再试。");
-      }
+      setTimeout(() => {
+        navigate("/worker");
+      }, 500);
+    } catch (error: any) {
+      console.error("保存工人失败:", error);
+      messageApi.error(error.response?.data?.msg || "保存工人失败");
     }
   };
 
+  // 取消按钮处理
   const handleCancel = () => {
-    navigate("/workers");
+    navigate("/worker");
   };
+
+  // 加载所有工序以供选择
+  useEffect(() => {
+    const loadProcesses = async () => {
+      try {
+        const processes = await getProcesses();
+        if (processes.data) {
+          setProcesses(processes.data);
+        } else {
+          messageApi.warning("未找到工序数据");
+        }
+      } catch (error) {
+        console.error("加载工序失败:", error);
+        messageApi.error("加载工序失败");
+      }
+    };
+    loadProcesses();
+  }, []);
 
   return (
     <>
-      <Title level={3} style={{ marginBottom: "24px" }}>
-        {isEditMode ? "编辑工人" : "新增工人"}
-      </Title>
+      {contextHolder}
+      <Typography.Title level={3}> {isEditMode ? "编辑工人" : "新增工人"}</Typography.Title>
 
-      <Form form={form} layout="vertical">
+      <Form form={form} layout="vertical" onFinish={handleFinish}>
         <Row gutter={24}>
           <Col span={8}>
             <Form.Item name="name" label="姓名" rules={[{ required: true, message: "请输入姓名" }]}>
@@ -149,7 +149,7 @@ const WorkerFormPage: React.FC = () => {
 
         <Row gutter={24}>
           <Col span={8}>
-            <Form.Item name="status" label="状态" rules={[{ required: true }]}>
+            <Form.Item name="status" label="状态" rules={[{ required: true }]} initialValue={"在职"}>
               <Radio.Group>
                 <Radio value="在职">在职</Radio>
                 <Radio value="离职">离职</Radio>
@@ -178,7 +178,7 @@ const WorkerFormPage: React.FC = () => {
             <Button onClick={handleCancel}>取消</Button>
           </Col>
           <Col>
-            <Button type="primary" onClick={handleSubmit}>
+            <Button type="primary" htmlType="submit" loading={loading}>
               保存
             </Button>
           </Col>
@@ -188,4 +188,4 @@ const WorkerFormPage: React.FC = () => {
   );
 };
 
-export default WorkerFormPage;
+export default WorkerCreatePage;

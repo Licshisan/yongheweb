@@ -1,5 +1,4 @@
-// LoginPage.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Form, Input, Button, message, Flex, Typography } from "antd";
 import { login } from "../services/user";
 import { setToken } from "../utils/auth";
@@ -13,9 +12,13 @@ const LoginPage = () => {
   const onFinish = async (values: { username: string; password: string }) => {
     setLoading(true);
     try {
-      const { token } = await login(values.username, values.password);
+      const result = await login(values.username, values.password);
+      if(!result.ok){
+        messageApi.warning(result.msg || "登录失败");
+        return;
+      }
       messageApi.success("登录成功");
-      setToken(token);
+      setToken(result.token);
       navigate("/dashboard");
     } catch (error: any) {
       messageApi.error(error.response?.data?.msg || "登录失败");
@@ -23,6 +26,14 @@ const LoginPage = () => {
       setLoading(false);
     }
   };
+
+  // 检查重新登录
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("relogin") === "1") {
+      messageApi.info("请重新登录");
+    }
+  }, [messageApi]);
 
   return (
     <>

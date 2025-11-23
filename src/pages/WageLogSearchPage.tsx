@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { ProTable } from "@ant-design/pro-components";
 import { Form, DatePicker, Select, Button, SelectProps, Space, Statistic } from "antd";
 import dayjs from "dayjs";
-import { getWorkers } from "../services/workers";
-import { getProcesses } from "../services/processes";
+import { getWorkers } from "../services/worker";
+import { getProcesses } from "../services/process";
 import { getFilteredWageLogs } from "../services/wageLogs";
 
 import * as XLSX from "xlsx";
@@ -84,8 +84,10 @@ const WageLogSearchPage: React.FC = () => {
   useEffect(() => {
     const loadProcesses = async () => {
       try {
-        const res = await getProcesses();
-        setProcesses(res.processes);
+        const result = await getProcesses();
+        if(result.data){
+          setProcesses(result.data);
+        }
       } catch (error) {
         console.error("加载工序失败:", error);
       }

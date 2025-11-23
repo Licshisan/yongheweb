@@ -1,10 +1,15 @@
-// utils/request.ts
 import axios from "axios";
-import { message } from "antd";
 import { getToken, removeToken } from "./auth";
 
+export interface ResponseData<T = undefined> {
+  ok: Boolean;
+  msg: string;
+  data?: T;
+  error?: string;
+}
+
 const request = axios.create({
-  baseURL: "http://127.0.0.1:5000/api", // 后端地址，按你实际的写
+  baseURL: "http://127.0.0.1:5000/api",
   timeout: 5000,
 });
 
@@ -18,17 +23,15 @@ request.interceptors.request.use((config) => {
 });
 
 // 响应错误统一处理
-// request.interceptors.response.use(
-//     (response) => response,
-//     (error) => {
-//       console.log("-----------请求失败-----------");
-//       if (error.response?.status === 401) {
-//         message.warning(error.response.data?.msg || '请重新登录');
-//         removeToken(); // 清除 token
-//         window.location.href = '/login'; // 跳转登录页面
-//       }
-//       return Promise.reject(error);
-//     }
-//   );
+request.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      removeToken();
+      window.location.href = '/login?relogin=1'; 
+    }
+    return Promise.reject(error);
+  },
+);
 
 export default request;

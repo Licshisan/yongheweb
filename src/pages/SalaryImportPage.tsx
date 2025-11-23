@@ -1,12 +1,11 @@
-// SalaryImportPage.tsx
 import React, { useState, useEffect } from "react";
 import { Upload, Button, Table, message, Progress } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import * as XLSX from "xlsx";
 import { getSpecModels } from "../services/specModel";
-import { getWorkers } from "../services/workers";
+import { getWorkers } from "../services/worker";
 import { batchCreateWageLogs } from "../services/wageLogs";
-import { getProcesses } from "../services/processes";
+import { getProcesses } from "../services/process";
 
 interface SpecModel {
   id: number;
@@ -65,8 +64,10 @@ const SalaryImportPage: React.FC = () => {
   useEffect(() => {
     const loadProcesses = async () => {
       try {
-        const res = await getProcesses();
-        setProcesses(res.processes);
+        const result = await getProcesses();
+        if (result.data){
+          setProcesses(result.data);
+        } 
       } catch (error) {
         console.error("加载工序失败:", error);
       }

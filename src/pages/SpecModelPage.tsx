@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Form, Input, Select, Modal, Table } from "antd";
 import { getSpecModels, createSpecModel, updateSpecModel, deleteSpecModel, SpecModel } from "../services/specModel";
-import { getProcesses } from "../services/processes";
+import { getProcesses } from "../services/process";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
@@ -35,8 +35,10 @@ const SpecModelPage: React.FC = () => {
 
   const loadProcesses = async () => {
     try {
-      const res = await getProcesses();
-      setProcesses(res.processes);
+      const result = await getProcesses();
+      if(result.data){
+        setProcesses(result.data);
+      }
     } catch (error) {
       console.error("加载工序失败:", error);
     }
