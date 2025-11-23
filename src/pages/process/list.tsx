@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getProcesses, createProcess, updateProcess, deleteProcess, Process } from '../services/processes'; 
+import { getProcesses, createProcess, updateProcess, deleteProcess, Process } from '../../services/processes'; 
 import { Button, Table, Modal, Form, Input } from 'antd';
 
 const ProcessPage = () => {
@@ -103,9 +103,6 @@ const ProcessPage = () => {
         style={{ width: 300, marginBottom: 20 }}
       />
 
-      <Button type="primary" onClick={() => setShowForm(true)} className="mb-4" style={{ float: 'right' }}>
-        新增工序
-      </Button>
 
       <Table 
         dataSource={processes} 

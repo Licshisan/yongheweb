@@ -26,14 +26,13 @@ const MenuList = () => {
       icon: <UserOutlined />,
       label: <Link to="/worker">工人信息</Link>,
       children: [
-        // 子菜单数组
         {
-          key: "/worker", // 子菜单1的 key，对应路由
+          key: "/worker",
           icon: <CiOutlined />,
           label: <Link to="/worker">工人列表</Link>,
         },
         {
-          key: "/worker/create", // 子菜单2的 key，对应路由
+          key: "/worker/create",
           icon: <PlusOutlined />,
           label: <Link to="/worker/create">新增工人</Link>,
         },
@@ -43,6 +42,18 @@ const MenuList = () => {
       key: "/process",
       icon: <AppstoreOutlined />,
       label: <Link to="/process">工序调整</Link>,
+      children: [
+        {
+          key: "/process",
+          icon: <CiOutlined />,
+          label: <Link to="/process">工序列表</Link>,
+        },
+        {
+          key: "/process/create",
+          icon: <PlusOutlined />,
+          label: <Link to="/process/create">创建工序</Link>,
+        },
+      ],
     },
     {
       key: "/spec-model",
