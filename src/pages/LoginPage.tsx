@@ -16,7 +16,7 @@ const LoginPage = () => {
       const { token } = await login(values.username, values.password);
       messageApi.success("登录成功");
       setToken(token);
-      navigate("/workers");
+      navigate("/dashboard");
     } catch (error: any) {
       messageApi.error(error.response?.data?.msg || "登录失败");
     } finally {

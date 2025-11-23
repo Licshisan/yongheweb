@@ -7,7 +7,9 @@ import LoginPage from './pages/LoginPage';
 import SalaryImportPage from './pages/SalaryImportPage';
 import Register from './pages/Register';
 import MainLayout from './components/MainLayout';
-import WorkerPage from './pages/WorkerPage';
+import WorkerPage from './pages/worker/list';
+import WorkerCreatePage from './pages/worker/create';
+import DashboardPage from './pages/dashboard';
 
 function App() {
   return (
@@ -18,11 +20,13 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         <Route element={<MainLayout />}>
-          <Route path="/workers" element={<WorkerPage />} />
-          <Route path="/processes" element={<ProcessPage />} />
-          <Route path="/spec-models" element={<SpecModelPage />} />
-          <Route path="/wage_logs" element={<WageLogPage />} />
-          <Route path="/wage_logs_check" element={<WageLogSearchPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/worker" element={<WorkerPage />} />
+          <Route path="/worker/create" element={<WorkerCreatePage />} />
+          <Route path="/process" element={<ProcessPage />} />
+          <Route path="/spec-model" element={<SpecModelPage />} />
+          <Route path="/wage_log" element={<WageLogPage />} />
+          <Route path="/wage_log_check" element={<WageLogSearchPage />} />
           <Route path="/salary_import" element={<SalaryImportPage />} />
         </Route>
       </Routes>
