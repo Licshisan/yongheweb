@@ -1,5 +1,5 @@
-import { Layout, theme } from 'antd';
-import { Menu } from 'antd';
+import { Layout, theme } from "antd";
+import { Menu } from "antd";
 import {
   UserOutlined,
   AppstoreOutlined,
@@ -9,69 +9,69 @@ import {
   UploadOutlined,
   PlusOutlined,
   CiOutlined,
-} from '@ant-design/icons';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+} from "@ant-design/icons";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 const MenuList = () => {
   const location = useLocation();
 
   const menuItems = [
     {
-      key: '/dashboard',
+      key: "/dashboard",
       icon: <AppstoreOutlined />,
       label: <Link to="/dashboard">仪表盘</Link>,
     },
     {
-      key: '/worker',
+      key: "/worker",
       icon: <UserOutlined />,
       label: <Link to="/worker">工人信息</Link>,
       children: [
         {
-          key: '/worker',
+          key: "/worker",
           icon: <CiOutlined />,
           label: <Link to="/worker">工人列表</Link>,
         },
         {
-          key: '/worker/create',
+          key: "/worker/create",
           icon: <PlusOutlined />,
           label: <Link to="/worker/create">新增工人</Link>,
         },
       ],
     },
     {
-      key: '/process',
+      key: "/process",
       icon: <AppstoreOutlined />,
       label: <Link to="/process">工序调整</Link>,
       children: [
         {
-          key: '/process',
+          key: "/process",
           icon: <CiOutlined />,
           label: <Link to="/process">工序列表</Link>,
         },
         {
-          key: '/process/create',
+          key: "/process/create",
           icon: <PlusOutlined />,
           label: <Link to="/process/create">创建工序</Link>,
         },
       ],
     },
     {
-      key: '/spec-model',
+      key: "/spec-model",
       icon: <DollarOutlined />,
       label: <Link to="/spec-model">规格工价</Link>,
     },
     {
-      key: '/wage_log',
+      key: "/wage_log",
       icon: <FileTextOutlined />,
       label: <Link to="/wage_log">日薪录入</Link>,
     },
     {
-      key: '/wage_log_check',
+      key: "/wage_log_check",
       icon: <SearchOutlined />,
       label: <Link to="/wage_log_check">工资查询</Link>,
     },
     {
-      key: '/salary_import',
+      key: "/salary_import",
       icon: <UploadOutlined />,
       label: <Link to="/salary_import">薪资导入</Link>,
     },
@@ -79,7 +79,7 @@ const MenuList = () => {
 
   return (
     <>
-      <div style={{ color: 'white', textAlign: 'center', lineHeight: '64px' }}>我的应用</div>
+      <div style={{ color: "white", textAlign: "center", lineHeight: "64px" }}>我的应用</div>
       <Menu theme="dark" mode="inline" selectedKeys={[location.pathname]} items={menuItems} />
     </>
   );
@@ -90,12 +90,12 @@ const MainLayout = () => {
     token: { colorBgContainer },
   } = theme.useToken();
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: "100vh" }}>
       <Layout.Sider width={200}>
         <MenuList />
       </Layout.Sider>
       <Layout>
-        <Layout.Content style={{ margin: '16px', background: colorBgContainer, padding: 24 }}>
+        <Layout.Content style={{ margin: "16px", background: colorBgContainer, padding: 24 }}>
           <Outlet />
         </Layout.Content>
       </Layout>

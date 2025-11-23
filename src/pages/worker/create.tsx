@@ -1,10 +1,10 @@
 // src/pages/workers/WorkerFormPage.tsx
-import React, { useEffect, useState } from 'react';
-import { Form, Input, Select, Button, Space, message, DatePicker, Radio, Card, Typography, Row, Col } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
-import { getProcesses } from '../../services/processes';
-import { createWorker, updateWorker } from '../../services/workers';
-import dayjs from 'dayjs';
+import React, { useEffect, useState } from "react";
+import { Form, Input, Select, Button, Space, message, DatePicker, Radio, Card, Typography, Row, Col } from "antd";
+import { useNavigate, useParams } from "react-router-dom";
+import { getProcesses } from "../../services/processes";
+import { createWorker, updateWorker } from "../../services/workers";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -27,8 +27,8 @@ const WorkerFormPage: React.FC = () => {
         const res = await getProcesses();
         setProcesses(res.processes || []);
       } catch (error) {
-        console.error('加载工序失败:', error);
-        message.error('加载工序失败');
+        console.error("加载工序失败:", error);
+        message.error("加载工序失败");
       }
     };
     loadProcesses();
@@ -41,9 +41,9 @@ const WorkerFormPage: React.FC = () => {
         try {
           setLoading(true);
         } catch (error) {
-          console.error('加载工人数据失败:', error);
-          message.error('加载工人数据失败，可能该工人已被删除。');
-          navigate('/workers'); // 加载失败则跳回列表页
+          console.error("加载工人数据失败:", error);
+          message.error("加载工人数据失败，可能该工人已被删除。");
+          navigate("/workers"); // 加载失败则跳回列表页
         } finally {
           setLoading(false);
         }
@@ -52,7 +52,7 @@ const WorkerFormPage: React.FC = () => {
     } else {
       setLoading(false);
       // 新增模式下设置默认状态
-      form.setFieldsValue({ status: '在职' });
+      form.setFieldsValue({ status: "在职" });
     }
   }, [id, isEditMode, form, navigate]);
 
@@ -63,53 +63,53 @@ const WorkerFormPage: React.FC = () => {
     }
   }, [initialData, loading, form]);
 
-  const status = Form.useWatch('status', form);
+  const status = Form.useWatch("status", form);
 
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
       const payload = {
         ...values,
-        entry_date: values.entry_date ? values.entry_date.format('YYYY-MM-DD') : null,
-        leave_date: values.leave_date ? values.leave_date.format('YYYY-MM-DD') : null,
+        entry_date: values.entry_date ? values.entry_date.format("YYYY-MM-DD") : null,
+        leave_date: values.leave_date ? values.leave_date.format("YYYY-MM-DD") : null,
       };
 
       if (isEditMode) {
         await updateWorker(Number(id), payload);
-        message.success('工人信息更新成功！');
+        message.success("工人信息更新成功！");
       } else {
         await createWorker(payload);
-        message.success('工人创建成功！');
+        message.success("工人创建成功！");
       }
-      navigate('/workers'); // 保存成功后跳回工人列表页
+      navigate("/workers"); // 保存成功后跳回工人列表页
     } catch (err: any) {
       if (err.errorFields) {
-        message.error('请检查并填写必填项');
+        message.error("请检查并填写必填项");
       } else {
-        message.error('操作失败，请稍后再试。');
+        message.error("操作失败，请稍后再试。");
       }
     }
   };
 
   const handleCancel = () => {
-    navigate('/workers');
+    navigate("/workers");
   };
 
   return (
     <>
-      <Title level={3} style={{ marginBottom: '24px' }}>
-        {isEditMode ? '编辑工人' : '新增工人'}
+      <Title level={3} style={{ marginBottom: "24px" }}>
+        {isEditMode ? "编辑工人" : "新增工人"}
       </Title>
 
       <Form form={form} layout="vertical">
         <Row gutter={24}>
           <Col span={8}>
-            <Form.Item name="name" label="姓名" rules={[{ required: true, message: '请输入姓名' }]}>
+            <Form.Item name="name" label="姓名" rules={[{ required: true, message: "请输入姓名" }]}>
               <Input />
             </Form.Item>
           </Col>
           <Col span={16}>
-            <Form.Item name="id_card" label="身份证号" rules={[{ required: true, message: '请输入身份证号' }]}>
+            <Form.Item name="id_card" label="身份证号" rules={[{ required: true, message: "请输入身份证号" }]}>
               <Input />
             </Form.Item>
           </Col>
@@ -122,7 +122,7 @@ const WorkerFormPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={16}>
-            <Form.Item name="process_id" label="所属工序" rules={[{ required: true, message: '请选择工序' }]}>
+            <Form.Item name="process_id" label="所属工序" rules={[{ required: true, message: "请选择工序" }]}>
               <Select placeholder="请选择工序" showSearch optionFilterProp="children">
                 {processes.map((proc) => (
                   <Option key={proc.id} value={proc.id}>
@@ -139,10 +139,10 @@ const WorkerFormPage: React.FC = () => {
             <Form.Item
               name="entry_date"
               label="入职日期"
-              rules={[{ required: true, message: '请选择入职日期' }]}
+              rules={[{ required: true, message: "请选择入职日期" }]}
               initialValue={dayjs()}
             >
-              <DatePicker style={{ width: '100%' }} />
+              <DatePicker style={{ width: "100%" }} />
             </Form.Item>
           </Col>
         </Row>
@@ -157,9 +157,9 @@ const WorkerFormPage: React.FC = () => {
             </Form.Item>
           </Col>
           <Col span={16}>
-            {status === '离职' && (
-              <Form.Item name="leave_date" label="离职日期" rules={[{ required: true, message: '请选择离职日期' }]}>
-                <DatePicker style={{ width: '100%' }} />
+            {status === "离职" && (
+              <Form.Item name="leave_date" label="离职日期" rules={[{ required: true, message: "请选择离职日期" }]}>
+                <DatePicker style={{ width: "100%" }} />
               </Form.Item>
             )}
           </Col>

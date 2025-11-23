@@ -1,11 +1,11 @@
-import { EditableProTable, ProColumns, ProFormSelect } from '@ant-design/pro-components';
-import { DatePicker, notification } from 'antd';
-import React, { useMemo, useRef, useState, useEffect } from 'react';
-import { getWorkers, getWorkersBySearchDate } from '../services/workers';
-import { getProcesses } from '../services/processes';
-import { getSpecModels } from '../services/specModel';
-import { updateWageLog, createWageLog, deleteWageLog, getWageLogById, getWageLogsByDate } from '../services/wageLogs';
-import dayjs from 'dayjs';
+import { EditableProTable, ProColumns, ProFormSelect } from "@ant-design/pro-components";
+import { DatePicker, notification } from "antd";
+import React, { useMemo, useRef, useState, useEffect } from "react";
+import { getWorkers, getWorkersBySearchDate } from "../services/workers";
+import { getProcesses } from "../services/processes";
+import { getSpecModels } from "../services/specModel";
+import { updateWageLog, createWageLog, deleteWageLog, getWageLogById, getWageLogsByDate } from "../services/wageLogs";
+import dayjs from "dayjs";
 
 interface WageLog {
   id: number;
@@ -62,7 +62,7 @@ const WageLogPage: React.FC = () => {
   // 搜索条件状态
   const [filterWorker, setFilterWorker] = useState<number>();
   const [filterProcess, setFilterProcess] = useState<number>();
-  const [filterDate, setFilterDate] = useState<string>(dayjs().format('YYYY-MM-DD'));
+  const [filterDate, setFilterDate] = useState<string>(dayjs().format("YYYY-MM-DD"));
 
   // 根据搜索条件过滤数据
   const filteredData = useMemo(() => {
@@ -82,13 +82,13 @@ const WageLogPage: React.FC = () => {
         //console.log(res);
         const workersWithProcessName = res.data.workers.map((w: any) => ({
           ...w,
-          process_name: w.process.name || '',
-          process_id: w.process.id || '',
+          process_name: w.process.name || "",
+          process_id: w.process.id || "",
         }));
         //console.log("所有工人记录：", workersWithProcessName);
         setAllWorkers(workersWithProcessName);
       } catch (error) {
-        console.error('加载工人失败:', error);
+        console.error("加载工人失败:", error);
       }
     };
     loadAllWorkers();
@@ -102,13 +102,13 @@ const WageLogPage: React.FC = () => {
         //console.log('res:',res);
         const workersWithProcessName = res.workers.map((w: any) => ({
           ...w,
-          process_name: w.process.name || '',
-          process_id: w.process.id || '',
+          process_name: w.process.name || "",
+          process_id: w.process.id || "",
         }));
         //console.log("所有工人记录：", workersWithProcessName);
         setWorkers(workersWithProcessName);
       } catch (error) {
-        console.error('加载工人失败:', error);
+        console.error("加载工人失败:", error);
       }
     };
     loadWorkers();
@@ -121,7 +121,7 @@ const WageLogPage: React.FC = () => {
         const res = await getProcesses();
         setProcesses(res.processes);
       } catch (error) {
-        console.error('加载工序失败:', error);
+        console.error("加载工序失败:", error);
       }
     };
     loadProcesses();
@@ -158,14 +158,14 @@ const WageLogPage: React.FC = () => {
           process_id: worker.process_id,
           process: worker.process_name,
           spec_model_id: 0,
-          spec_model: '',
+          spec_model: "",
           actual_price: 0,
           actual_group_size: 1,
           quantity: 0,
           group_size: 1,
           total_wage: 0,
           date: filterDate,
-          remark: '',
+          remark: "",
         }));
       //console.log("补足不在工资记录上的工人后的信息:", [...wageLogs, ...missingLogs]);
       setDataSource([...wageLogs, ...missingLogs]);
@@ -177,10 +177,10 @@ const WageLogPage: React.FC = () => {
 
   const columns: ProColumns<WageLog>[] = [
     {
-      title: '工人姓名',
-      dataIndex: 'worker_id',
+      title: "工人姓名",
+      dataIndex: "worker_id",
       sorter: (a, b) => a.worker_id - b.worker_id,
-      valueType: 'select',
+      valueType: "select",
       request: async () =>
         allWorkers.map((item) => ({
           label: item.name,
@@ -190,7 +190,7 @@ const WageLogPage: React.FC = () => {
       fieldProps: (form, config) => ({
         showSearch: true,
         filterOption: (input: string, option: { label: any }) =>
-          (option?.label ?? '').toLowerCase().includes(input.toLowerCase()),
+          (option?.label ?? "").toLowerCase().includes(input.toLowerCase()),
         onChange: (value) => {
           const rowKey = config?.rowKey;
           const worker = workers.find((item) => item.id === Number(value));
@@ -205,15 +205,15 @@ const WageLogPage: React.FC = () => {
           }
         },
       }),
-      width: '7%',
-      align: 'center', // 设置内容居中
+      width: "7%",
+      align: "center", // 设置内容居中
     },
 
     {
-      title: '工序',
-      dataIndex: 'process_id',
+      title: "工序",
+      dataIndex: "process_id",
       sorter: (a, b) => a.process_id - b.process_id,
-      valueType: 'select',
+      valueType: "select",
       request: async () =>
         processes.map((item) => ({
           label: item.name,
@@ -223,7 +223,7 @@ const WageLogPage: React.FC = () => {
       fieldProps: (form, config) => ({
         showSearch: true,
         filterOption: (input: string, option: { label: any }) =>
-          (option?.label ?? '').toLowerCase().includes(input.toLowerCase()),
+          (option?.label ?? "").toLowerCase().includes(input.toLowerCase()),
         onChange: (value) => {
           const rowKey = config?.rowKey;
           if (rowKey && form) {
@@ -236,18 +236,18 @@ const WageLogPage: React.FC = () => {
           }
         },
       }),
-      align: 'center',
+      align: "center",
     },
     {
-      title: '规格型号',
-      dataIndex: 'spec_model_id',
+      title: "规格型号",
+      dataIndex: "spec_model_id",
       sorter: (a, b) => a.spec_model_id - b.spec_model_id,
-      valueType: 'select',
+      valueType: "select",
       formItemProps: { rules: [{ required: true }] },
-      dependencies: ['process_id'],
+      dependencies: ["process_id"],
       fieldProps: (form, config) => {
         const rowKey = config?.rowKey;
-        const processId = form?.getFieldValue?.([rowKey, 'process_id']);
+        const processId = form?.getFieldValue?.([rowKey, "process_id"]);
         const options = allSpecModels
           .filter((item) => item.process_id === processId)
           .map((item) => ({
@@ -258,13 +258,13 @@ const WageLogPage: React.FC = () => {
         return {
           showSearch: true,
           filterOption: (input: string, option: { label: any }) =>
-            (option?.label ?? '').toLowerCase().includes(input.toLowerCase()),
+            (option?.label ?? "").toLowerCase().includes(input.toLowerCase()),
           options,
           onChange: (value: number) => {
             const spec = allSpecModels.find((item) => item.id === value);
             if (spec) {
               const rowKey = String(config.rowKey);
-              const quantity = form?.getFieldValue?.([rowKey, 'quantity']) ?? 0;
+              const quantity = form?.getFieldValue?.([rowKey, "quantity"]) ?? 0;
               const total = parseFloat((spec.price * quantity).toFixed(2));
 
               form?.setFieldsValue({
@@ -279,21 +279,21 @@ const WageLogPage: React.FC = () => {
       },
       render: (_, record) => {
         const spec = allSpecModels.find((item) => item.id === Number(record.spec_model_id));
-        return spec ? spec.name : '-';
+        return spec ? spec.name : "-";
       },
-      align: 'center',
+      align: "center",
     },
     {
-      title: '工价',
-      dataIndex: 'actual_price',
-      valueType: 'digit',
+      title: "工价",
+      dataIndex: "actual_price",
+      valueType: "digit",
       formItemProps: { rules: [{ required: true }] },
       fieldProps: (form, config) => {
         const rowKey = String(config?.rowKey); // 强制转成字符串，避免 TS 报错
         return {
           onChange: (value: number) => {
-            const quantity = form?.getFieldValue?.([rowKey, 'quantity']) || 0;
-            const actual_group_size = form?.getFieldValue?.([rowKey, 'actual_group_size']) || 0;
+            const quantity = form?.getFieldValue?.([rowKey, "quantity"]) || 0;
+            const actual_group_size = form?.getFieldValue?.([rowKey, "actual_group_size"]) || 0;
             const total = parseFloat(((value * quantity) / actual_group_size).toFixed(1));
             form?.setFieldsValue?.({
               [rowKey]: {
@@ -303,19 +303,19 @@ const WageLogPage: React.FC = () => {
           },
         };
       },
-      align: 'center',
+      align: "center",
     },
     {
-      title: '数量',
-      dataIndex: 'quantity',
-      valueType: 'digit',
+      title: "数量",
+      dataIndex: "quantity",
+      valueType: "digit",
       formItemProps: { rules: [{ required: true }] },
       fieldProps: (form, config) => {
         const rowKey = String(config?.rowKey); // 强制转成字符串，避免 TS 报错
         return {
           onChange: (value: number) => {
-            const actual_price = form?.getFieldValue?.([rowKey, 'actual_price']) || 0;
-            const actual_group_size = form?.getFieldValue?.([rowKey, 'actual_group_size']) || 0;
+            const actual_price = form?.getFieldValue?.([rowKey, "actual_price"]) || 0;
+            const actual_group_size = form?.getFieldValue?.([rowKey, "actual_group_size"]) || 0;
             const total = parseFloat(((value * actual_price) / actual_group_size).toFixed(1));
             form?.setFieldsValue?.({
               [rowKey]: {
@@ -325,19 +325,19 @@ const WageLogPage: React.FC = () => {
           },
         };
       },
-      align: 'center',
+      align: "center",
     },
     {
-      title: '组人数',
-      dataIndex: 'actual_group_size',
-      valueType: 'digit',
+      title: "组人数",
+      dataIndex: "actual_group_size",
+      valueType: "digit",
       formItemProps: { rules: [{ required: true }] },
       fieldProps: (form, config) => {
         const rowKey = String(config?.rowKey); // 强制转成字符串，避免 TS 报错
         return {
           onChange: (value: number) => {
-            const actual_price = form?.getFieldValue?.([rowKey, 'actual_price']) || 0;
-            const quantity = form?.getFieldValue?.([rowKey, 'quantity']) || 0;
+            const actual_price = form?.getFieldValue?.([rowKey, "actual_price"]) || 0;
+            const quantity = form?.getFieldValue?.([rowKey, "quantity"]) || 0;
             const total = parseFloat(((actual_price * quantity) / value).toFixed(1));
             form?.setFieldsValue?.({
               [rowKey]: {
@@ -347,7 +347,7 @@ const WageLogPage: React.FC = () => {
           },
         };
       },
-      align: 'center',
+      align: "center",
     },
     /** 
     {
@@ -357,28 +357,28 @@ const WageLogPage: React.FC = () => {
       formItemProps: { rules: [{ required: true }] },
     },*/
     {
-      title: '工资',
-      dataIndex: 'total_wage',
-      valueType: 'digit',
+      title: "工资",
+      dataIndex: "total_wage",
+      valueType: "digit",
       ///renderText: (_: any, row: WageLog) =>
       // (row.actual_price * row.quantity/ row.actual_group_size).toFixed(2),
-      align: 'center',
+      align: "center",
     },
     {
-      title: '日期',
-      dataIndex: 'date',
-      valueType: 'date',
+      title: "日期",
+      dataIndex: "date",
+      valueType: "date",
       initialValue: filterDate,
-      align: 'center',
+      align: "center",
     },
     {
-      title: '备注',
-      dataIndex: 'remark',
-      valueType: 'text',
+      title: "备注",
+      dataIndex: "remark",
+      valueType: "text",
     },
     {
-      title: '操作',
-      valueType: 'option',
+      title: "操作",
+      valueType: "option",
       render: (_, record) => [
         // eslint-disable-next-line jsx-a11y/anchor-is-valid
         <a
@@ -401,7 +401,7 @@ const WageLogPage: React.FC = () => {
               if (error.response && error.response.status === 404) {
                 hasRecord = false;
               } else {
-                notification.error({ message: '查询工资记录失败' });
+                notification.error({ message: "查询工资记录失败" });
                 return;
               }
             }
@@ -420,9 +420,9 @@ const WageLogPage: React.FC = () => {
       <div
         style={{
           marginBottom: 26,
-          display: 'flex',
+          display: "flex",
           gap: 16,
-          alignItems: 'center',
+          alignItems: "center",
         }}
       >
         <ProFormSelect
@@ -434,7 +434,7 @@ const WageLogPage: React.FC = () => {
           }))}
           fieldProps={{
             showSearch: true, // 开启搜索
-            optionFilterProp: 'label', // 允许根据 label 过滤
+            optionFilterProp: "label", // 允许根据 label 过滤
             value: filterWorker,
             onChange: setFilterWorker,
             allowClear: true,
@@ -453,7 +453,7 @@ const WageLogPage: React.FC = () => {
           }))}
           fieldProps={{
             showSearch: true, // 开启搜索
-            optionFilterProp: 'label', // 允许根据 label 过滤
+            optionFilterProp: "label", // 允许根据 label 过滤
             value: filterProcess,
             onChange: setFilterProcess,
             allowClear: true,
@@ -468,7 +468,7 @@ const WageLogPage: React.FC = () => {
           placeholder="选择日期"
           value={dayjs(filterDate)}
           onChange={(_, dateString) => {
-            if (typeof dateString === 'string') setFilterDate(dateString);
+            if (typeof dateString === "string") setFilterDate(dateString);
           }}
         />
       </div>
@@ -481,11 +481,11 @@ const WageLogPage: React.FC = () => {
         value={filteredData}
         onChange={(value) => setDataSource([...value])}
         editable={{
-          type: 'multiple',
+          type: "multiple",
           editableKeys,
           onChange: setEditableRowKeys,
           onSave: async (_, record) => {
-            console.log('编辑表存时record数据:', record);
+            console.log("编辑表存时record数据:", record);
             const updatedRow = {
               ...record,
             };
@@ -500,7 +500,7 @@ const WageLogPage: React.FC = () => {
               if (error.response && error.response.status === 404) {
                 hasRecord = false;
               } else {
-                notification.error({ message: '查询工资记录失败' });
+                notification.error({ message: "查询工资记录失败" });
                 return;
               }
             }
@@ -543,16 +543,16 @@ const WageLogPage: React.FC = () => {
 
             //updateWageLog(updateToDatabase.id, updateToDatabase);
             setDataSource(newData);
-            notification.success({ message: '保存成功' });
+            notification.success({ message: "保存成功" });
           },
         }}
         recordCreatorProps={{
-          position: 'top',
+          position: "top",
           record: () => ({
             id: Date.now(),
-            worker: '',
+            worker: "",
             worker_id: 0,
-            process: '',
+            process: "",
             process_id: 0,
             //spec_model: '',
             spec_model_id: 0,
@@ -562,7 +562,7 @@ const WageLogPage: React.FC = () => {
             group_size: 1,
             total_wage: 0,
             date: filterDate,
-            remark: '',
+            remark: "",
           }),
         }}
       />

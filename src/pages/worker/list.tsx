@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { Typography, Space, message, Input, Checkbox, Table, Button } from 'antd';
+import { useEffect, useState } from "react";
+import { Typography, Space, message, Input, Checkbox, Table, Button } from "antd";
 
-import { Worker, getWorkers, updateWorker, deleteWorker } from '../../services/workers';
+import { Worker, getWorkers, updateWorker, deleteWorker } from "../../services/workers";
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -17,50 +17,50 @@ interface WorkerListProps {
 const WorkerList: React.FC<WorkerListProps> = ({ workers, onEdit, onDelete }) => {
   const columns = [
     {
-      title: '姓名',
-      dataIndex: 'name',
-      key: 'name',
+      title: "姓名",
+      dataIndex: "name",
+      key: "name",
     },
     {
-      title: '身份证',
-      dataIndex: 'id_card',
-      key: 'id_card',
+      title: "身份证",
+      dataIndex: "id_card",
+      key: "id_card",
     },
     {
-      title: '分组',
-      dataIndex: 'group',
-      key: 'group',
+      title: "分组",
+      dataIndex: "group",
+      key: "group",
     },
     {
-      title: '所属工序',
-      dataIndex: ['process', 'name'],
-      key: 'process_name',
-      render: (text: string) => text || '-',
+      title: "所属工序",
+      dataIndex: ["process", "name"],
+      key: "process_name",
+      render: (text: string) => text || "-",
     },
     {
-      title: '入职时间',
-      dataIndex: 'entry_date',
-      key: 'entry_date',
+      title: "入职时间",
+      dataIndex: "entry_date",
+      key: "entry_date",
     },
     {
-      title: '离职时间',
-      dataIndex: 'leave_date',
-      key: 'leave_date',
-      render: (text: string | null) => (text ? text : '-'),
+      title: "离职时间",
+      dataIndex: "leave_date",
+      key: "leave_date",
+      render: (text: string | null) => (text ? text : "-"),
     },
     {
-      title: '是否在职',
-      dataIndex: 'status',
-      key: 'status',
+      title: "是否在职",
+      dataIndex: "status",
+      key: "status",
     },
     {
-      title: '备注',
-      dataIndex: 'remark',
-      key: 'remark',
+      title: "备注",
+      dataIndex: "remark",
+      key: "remark",
     },
     {
-      title: '操作',
-      key: 'actions',
+      title: "操作",
+      key: "actions",
       render: (_: any, record: Worker) => (
         <Space>
           <Button type="link" onClick={() => onEdit(record)}>
@@ -83,15 +83,15 @@ const WorkerPage = () => {
   const [filteredWorkers, setFilteredWorkers] = useState<Worker[]>([]);
   const [editing, setEditing] = useState<Worker | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string[]>(['在职']);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string[]>(["在职"]);
 
   const loadWorkers = async () => {
     try {
       const res = await getWorkers();
       setWorkers(res.data.workers);
     } catch (err) {
-      message.error('加载工人信息失败');
+      message.error("加载工人信息失败");
     }
   };
 
@@ -105,8 +105,8 @@ const WorkerPage = () => {
 
   const applyFilters = (keyword: string, statuses: string[]) => {
     const filtered = workers.filter((worker) => {
-      const matchName = worker.name.toLowerCase().includes((keyword || '').toLowerCase());
-      const matchStatus = statuses.length === 0 || statuses.includes(worker.status || '');
+      const matchName = worker.name.toLowerCase().includes((keyword || "").toLowerCase());
+      const matchStatus = statuses.length === 0 || statuses.includes(worker.status || "");
       return matchName && matchStatus;
     });
     setFilteredWorkers(filtered);
@@ -126,22 +126,22 @@ const WorkerPage = () => {
     if (!editing) return;
     try {
       await updateWorker(editing.id, data);
-      message.success('更新成功');
+      message.success("更新成功");
       setEditing(null);
       setModalVisible(false);
       loadWorkers();
     } catch (err) {
-      message.error('保存失败');
+      message.error("保存失败");
     }
   };
 
   const handleDelete = async (id: number) => {
     try {
       await deleteWorker(id);
-      message.success('删除成功');
+      message.success("删除成功");
       loadWorkers();
     } catch (err) {
-      message.error('删除失败');
+      message.error("删除失败");
     }
   };
 
@@ -158,8 +158,8 @@ const WorkerPage = () => {
         <Checkbox.Group
           style={{ marginRight: 16 }}
           options={[
-            { label: '在职', value: '在职' },
-            { label: '离职', value: '离职' },
+            { label: "在职", value: "在职" },
+            { label: "离职", value: "离职" },
           ]}
           value={statusFilter}
           onChange={handleStatusChange}

@@ -1,4 +1,4 @@
-import request from '../utils/request';
+import request from "../utils/request";
 
 // WageLog 类型定义
 export interface WageLog {
@@ -19,10 +19,10 @@ export interface WageLog {
 // 获取所有工资记录
 export const getWageLogs = async () => {
   try {
-    const response = await request.get('/api/wage_logs/');
+    const response = await request.get("/api/wage_logs/");
     return response.data; // 假设返回的数据包含 'wage_logs' 字段
   } catch (error) {
-    console.error('加载工资记录失败:', error);
+    console.error("加载工资记录失败:", error);
     throw error;
   }
 };
@@ -33,31 +33,31 @@ export const getWagePriceByProcessAndSpec = async (processId: number, specModelI
     const response = await request.get(`/api/wage_price/${processId}/${specModelId}`);
     return response.data; // 假设返回的数据包含 'wage_price' 字段
   } catch (error) {
-    console.error('获取工价失败:', error);
+    console.error("获取工价失败:", error);
     throw error;
   }
 };
 
 // 创建新的工资记录
-export const createWageLog = async (wageLogData: Omit<WageLog, 'id'>) => {
+export const createWageLog = async (wageLogData: Omit<WageLog, "id">) => {
   try {
-    console.log('wageLogData:', wageLogData);
-    const response = await request.post('/api/wage_logs/', wageLogData);
+    console.log("wageLogData:", wageLogData);
+    const response = await request.post("/api/wage_logs/", wageLogData);
     return response.data; // 假设返回的是创建成功的工资记录
   } catch (error) {
-    console.error('保存工资记录失败:', error);
+    console.error("保存工资记录失败:", error);
     throw error;
   }
 };
 
 // 批量创建工资记录
-export const batchCreateWageLogs = async (wageLogs: Omit<WageLog, 'id'>[]) => {
+export const batchCreateWageLogs = async (wageLogs: Omit<WageLog, "id">[]) => {
   try {
     // 假设后端提供 /api/wage_logs/batch POST 接口接收数组
-    const response = await request.post('/api/wage_logs/batch_import', wageLogs);
+    const response = await request.post("/api/wage_logs/batch_import", wageLogs);
     return response.data; // 返回批量创建结果
   } catch (error) {
-    console.error('批量保存工资记录失败:', error);
+    console.error("批量保存工资记录失败:", error);
     throw error;
   }
 };
@@ -68,7 +68,7 @@ export const updateWageLog = async (id: number, wageLogData: WageLog) => {
     const response = await request.put(`/api/wage_logs/${id}`, wageLogData);
     return response.data; // 假设返回的是更新后的工资记录
   } catch (error) {
-    console.error('更新工资记录失败:', error);
+    console.error("更新工资记录失败:", error);
     throw error;
   }
 };
@@ -79,7 +79,7 @@ export const deleteWageLog = async (id: number) => {
     const response = await request.delete(`/api/wage_logs/${id}`);
     return response.data; // 假设返回的是删除结果
   } catch (error) {
-    console.error('删除工资记录失败:', error);
+    console.error("删除工资记录失败:", error);
     throw error;
   }
 };
@@ -90,7 +90,7 @@ export const getWageLogById = async (id: number) => {
     const response = await request.get(`/api/wage_logs/${id}`);
     return response.data; // 假设后端返回的是一个 WageLog 对象
   } catch (error) {
-    console.error('获取工资记录失败:', error);
+    console.error("获取工资记录失败:", error);
     throw error;
   }
 };
@@ -98,7 +98,7 @@ export const getWageLogById = async (id: number) => {
 // 根据指定日期获取工资记录
 export const getWageLogsByDate = async (date: string) => {
   try {
-    const response = await request.get('/api/wage_logs/', {
+    const response = await request.get("/api/wage_logs/", {
       params: { date }, // 假设后端通过 query 参数 ?date=yyyy-mm-dd 来筛选
     });
     return response.data; // 返回的数据结构应与 getWageLogs 相同
@@ -117,6 +117,6 @@ export const getFilteredWageLogs = async (params: {
   //page?: number;
   //page_size?: number;
 }) => {
-  const response = await request.get('/api/wage_logs/query', { params });
+  const response = await request.get("/api/wage_logs/query", { params });
   return response.data;
 };

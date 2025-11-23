@@ -1,30 +1,20 @@
-// src/pages/processes/ProcessFormPage.tsx
-import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, Card, Typography, message, Row, Col } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
-import { createProcess, updateProcess } from '../../services/processes'; // 假设你有这些API服务
-
-const { Title } = Typography;
-
-// 定义工序的数据类型
-interface Process {
-  id?: number;
-  name: string;
-  description: string;
-}
+import React, { useEffect, useState } from "react";
+import { Form, Input, Button, Typography, message, Row, Col } from "antd";
+import { useNavigate, useParams } from "react-router-dom";
+import { createProcess, Process, updateProcess, getProcess } from "../../services/processes";
 
 const ProcessFormPage: React.FC = () => {
   const [form] = Form.useForm();
   const [initialData, setInitialData] = useState<Process>({
-    name: '',
-    description: '',
+    id: 0,
+    name: "",
+    description: "",
   });
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>(); // 从URL获取工序ID
+  const { id } = useParams<{ id: string }>();
 
-  // 判断是新增还是编辑模式
   const isEditMode = !!id;
 
   // 加载工序数据（仅在编辑模式下）
@@ -33,10 +23,10 @@ const ProcessFormPage: React.FC = () => {
       const loadProcessData = async () => {
         try {
           setLoading(true);
+          const process = await getProcess(Number(id));
+          setInitialData(process);
         } catch (error) {
-          console.error('加载工序数据失败:', error);
-          message.error('加载工序数据失败，请稍后再试。');
-          navigate('/processes'); // 加载失败则跳回列表页
+          navigate("/processes");
         } finally {
           setLoading(false);
         }
@@ -59,43 +49,41 @@ const ProcessFormPage: React.FC = () => {
       if (isEditMode && id) {
         // 编辑模式：调用更新接口
         await updateProcess(Number(id), values);
-        message.success('工序更新成功！');
+        message.success("工序更新成功！");
       } else {
         // 新增模式：调用创建接口
         await createProcess(values);
-        message.success('工序创建成功！');
+        message.success("工序创建成功！");
       }
       // 操作成功后跳转到工序列表页
-      navigate('/processes');
+      navigate("/processes");
     } catch (error) {
-      console.error('保存工序失败:', error);
-      message.error('保存工序失败，请稍后再试。');
+      console.error("保存工序失败:", error);
+      message.error("保存工序失败，请稍后再试。");
     }
-  };
-
-  const handleCancel = () => {
-    navigate('/processes');
   };
 
   return (
     <>
-      <Title level={3}>{isEditMode ? '编辑工序' : '新增工序'}</Title>
+      <Typography.Title level={3}>{isEditMode ? "编辑工序" : "新增工序"}</Typography.Title>
 
       <Form form={form} layout="vertical" onFinish={handleFinish}>
-        <Form.Item label="工序名称" name="name" rules={[{ required: true, message: '请输入工序名称' }]}>
+        <Form.Item label="工序名称" name="name" rules={[{ required: true, message: "请输入工序名称" }]}>
           <Input placeholder="请输入工序名称" />
         </Form.Item>
 
-        <Form.Item label="描述" name="description" rules={[{ required: true, message: '请输入工序描述' }]}>
+        <Form.Item label="描述" name="description" rules={[{ required: true, message: "请输入工序描述" }]}>
           <Input.TextArea rows={4} placeholder="请输入工序描述" />
         </Form.Item>
 
         <Row gutter={24} justify="end">
           <Col>
-            <Button onClick={handleCancel}>取消</Button>
+            <Button onClick={() => navigate("/processes")}>取消</Button>
           </Col>
           <Col>
-            <Button type="primary">保存</Button>
+            <Button type="primary" htmlType="submit">
+              保存
+            </Button>
           </Col>
         </Row>
       </Form>

@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { getProcesses, createProcess, updateProcess, deleteProcess, Process } from '../../services/processes';
-import { Button, Table, Modal, Form, Input } from 'antd';
+import React, { useState, useEffect } from "react";
+import { getProcesses, createProcess, updateProcess, deleteProcess, Process } from "../../services/processes";
+import { Button, Table, Modal, Form, Input } from "antd";
 
 const ProcessPage = () => {
   const [processes, setProcesses] = useState<Process[]>([]);
   const [editing, setEditing] = useState<Process | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [searchTerm, setSearchTerm] = useState<string>(''); // 用于存储搜索框的值
+  const [searchTerm, setSearchTerm] = useState<string>(""); // 用于存储搜索框的值
 
-  const loadProcesses = async (search: string = '') => {
+  const loadProcesses = async (search: string = "") => {
     try {
       const res = await getProcesses();
       // 如果有搜索条件，过滤结果
@@ -17,7 +17,7 @@ const ProcessPage = () => {
       );
       setProcesses(filteredProcesses);
     } catch (error) {
-      console.error('加载工序失败:', error);
+      console.error("加载工序失败:", error);
     }
   };
 
@@ -44,7 +44,7 @@ const ProcessPage = () => {
       setShowForm(false);
       loadProcesses(); // 更新工序列表
     } catch (error) {
-      console.error('保存工序失败:', error);
+      console.error("保存工序失败:", error);
     }
   };
 
@@ -54,24 +54,24 @@ const ProcessPage = () => {
       await deleteProcess(id);
       loadProcesses(); // 更新工序列表
     } catch (error) {
-      console.error('删除工序失败:', error);
+      console.error("删除工序失败:", error);
     }
   };
 
   const columns = [
     {
-      title: '工序名称',
-      dataIndex: 'name',
-      key: 'name',
+      title: "工序名称",
+      dataIndex: "name",
+      key: "name",
     },
     {
-      title: '描述',
-      dataIndex: 'description',
-      key: 'description',
+      title: "描述",
+      dataIndex: "description",
+      key: "description",
     },
     {
-      title: '操作',
-      key: 'actions',
+      title: "操作",
+      key: "actions",
       render: (_: any, record: Process) => (
         <div>
           <Button type="link" onClick={() => handleEdit(record)}>
@@ -115,9 +115,9 @@ const ProcessPage = () => {
       />
 
       {/* 工序表单 */}
-      <Modal title={editing ? '编辑工序' : '新增工序'} visible={showForm} onCancel={handleCancel} footer={null}>
+      <Modal title={editing ? "编辑工序" : "新增工序"} visible={showForm} onCancel={handleCancel} footer={null}>
         <ProcessForm
-          initialData={editing || { id: 0, name: '', description: '' }} // Fix: add id to the default object
+          initialData={editing || { id: 0, name: "", description: "" }} // Fix: add id to the default object
           onSave={handleSave}
           onCancel={handleCancel}
         />
@@ -152,11 +152,11 @@ const ProcessForm = ({
 
   return (
     <Form form={form} initialValues={initialData} onFinish={handleFinish} layout="vertical">
-      <Form.Item label="工序名称" name="name" rules={[{ required: true, message: '请输入工序名称' }]}>
+      <Form.Item label="工序名称" name="name" rules={[{ required: true, message: "请输入工序名称" }]}>
         <Input />
       </Form.Item>
 
-      <Form.Item label="描述" name="description" rules={[{ required: true, message: '请输入工序描述' }]}>
+      <Form.Item label="描述" name="description" rules={[{ required: true, message: "请输入工序描述" }]}>
         <Input />
       </Form.Item>
 

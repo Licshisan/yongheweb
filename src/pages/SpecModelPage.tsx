@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Form, Input, Select, Modal, Table } from 'antd';
-import { getSpecModels, createSpecModel, updateSpecModel, deleteSpecModel, SpecModel } from '../services/specModel';
-import { getProcesses } from '../services/processes';
-import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
+import React, { useState, useEffect } from "react";
+import { Button, Form, Input, Select, Modal, Table } from "antd";
+import { getSpecModels, createSpecModel, updateSpecModel, deleteSpecModel, SpecModel } from "../services/specModel";
+import { getProcesses } from "../services/processes";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -14,7 +14,7 @@ const SpecModelPage: React.FC = () => {
   const [editing, setEditing] = useState<SpecModel | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     loadSpecModels();
@@ -27,7 +27,7 @@ const SpecModelPage: React.FC = () => {
       const res = await getSpecModels();
       setSpecModels(res.specModels);
     } catch (error) {
-      console.error('加载规格型号失败:', error);
+      console.error("加载规格型号失败:", error);
     } finally {
       setLoading(false);
     }
@@ -38,7 +38,7 @@ const SpecModelPage: React.FC = () => {
       const res = await getProcesses();
       setProcesses(res.processes);
     } catch (error) {
-      console.error('加载工序失败:', error);
+      console.error("加载工序失败:", error);
     }
   };
 
@@ -53,7 +53,7 @@ const SpecModelPage: React.FC = () => {
       setShowForm(false);
       loadSpecModels();
     } catch (error) {
-      console.error('保存规格型号失败:', error);
+      console.error("保存规格型号失败:", error);
     }
   };
 
@@ -62,7 +62,7 @@ const SpecModelPage: React.FC = () => {
       await deleteSpecModel(id);
       loadSpecModels();
     } catch (error) {
-      console.error('删除规格型号失败:', error);
+      console.error("删除规格型号失败:", error);
     }
   };
 
@@ -93,36 +93,36 @@ const SpecModelPage: React.FC = () => {
         规格名称: spec.name,
         分类: spec.category,
         工价: spec.price,
-        工序: process ? process.name : '-',
+        工序: process ? process.name : "-",
       };
     });
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, '规格型号');
+    XLSX.utils.book_append_sheet(workbook, worksheet, "规格型号");
 
     const excelBuffer = XLSX.write(workbook, {
-      bookType: 'xlsx',
-      type: 'array',
+      bookType: "xlsx",
+      type: "array",
     });
-    const data = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    saveAs(data, '规格型号.xlsx');
+    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(data, "规格型号.xlsx");
   };
 
   const columns = [
-    { title: '规格名称', dataIndex: 'name' },
-    { title: '分类', dataIndex: 'category' },
-    { title: '价格', dataIndex: 'price' },
+    { title: "规格名称", dataIndex: "name" },
+    { title: "分类", dataIndex: "category" },
+    { title: "价格", dataIndex: "price" },
     {
-      title: '工序',
-      dataIndex: 'process_id',
+      title: "工序",
+      dataIndex: "process_id",
       render: (processId: number) => {
         const process = processes.find((p) => p.id === processId);
-        return process ? process.name : '-';
+        return process ? process.name : "-";
       },
     },
     {
-      title: '操作',
+      title: "操作",
       render: (_: any, spec: SpecModel) => (
         <div>
           <Button type="link" onClick={() => handleEdit(spec)}>
@@ -151,7 +151,7 @@ const SpecModelPage: React.FC = () => {
           新增规格型号
         </Button>
 
-        <Button style={{ float: 'right' }} onClick={handleExport}>
+        <Button style={{ float: "right" }} onClick={handleExport}>
           导出查询结果
         </Button>
       </div>
@@ -160,7 +160,7 @@ const SpecModelPage: React.FC = () => {
 
       <Modal
         open={showForm}
-        title={editing ? '编辑规格型号' : '新增规格型号'}
+        title={editing ? "编辑规格型号" : "新增规格型号"}
         onCancel={handleCancel}
         footer={null}
         destroyOnClose
@@ -202,15 +202,15 @@ const SpecModelForm: React.FC<SpecModelFormProps> = ({ initialData, onSave, onCa
     <Form
       form={form}
       initialValues={{
-        name: initialData?.name || '',
-        category: initialData?.category || '',
-        process_id: initialData?.process_id || '',
-        price: initialData?.price || '',
+        name: initialData?.name || "",
+        category: initialData?.category || "",
+        process_id: initialData?.process_id || "",
+        price: initialData?.price || "",
       }}
       layout="vertical"
       onFinish={handleSubmit}
     >
-      <Form.Item name="process_id" label="选择工序" rules={[{ required: true, message: '请选择工序！' }]}>
+      <Form.Item name="process_id" label="选择工序" rules={[{ required: true, message: "请选择工序！" }]}>
         <Select placeholder="请选择工序">
           {processes.map((process) => (
             <Option key={process.id} value={process.id}>
@@ -220,15 +220,15 @@ const SpecModelForm: React.FC<SpecModelFormProps> = ({ initialData, onSave, onCa
         </Select>
       </Form.Item>
 
-      <Form.Item name="name" label="规格名称" rules={[{ required: true, message: '请输入规格名称！' }]}>
+      <Form.Item name="name" label="规格名称" rules={[{ required: true, message: "请输入规格名称！" }]}>
         <Input />
       </Form.Item>
 
-      <Form.Item name="category" label="分类" rules={[{ required: true, message: '请输入分类！' }]}>
+      <Form.Item name="category" label="分类" rules={[{ required: true, message: "请输入分类！" }]}>
         <Input />
       </Form.Item>
 
-      <Form.Item name="price" label="工价" rules={[{ required: true, message: '请输入工价！' }]}>
+      <Form.Item name="price" label="工价" rules={[{ required: true, message: "请输入工价！" }]}>
         <Input type="number" />
       </Form.Item>
 

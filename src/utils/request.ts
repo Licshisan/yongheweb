@@ -1,10 +1,10 @@
 // utils/request.ts
-import axios from 'axios';
-import { message } from 'antd';
-import { getToken, removeToken } from './auth';
+import axios from "axios";
+import { message } from "antd";
+import { getToken, removeToken } from "./auth";
 
 const request = axios.create({
-  baseURL: 'http://127.0.0.1:5000/api', // 后端地址，按你实际的写
+  baseURL: "http://127.0.0.1:5000/api", // 后端地址，按你实际的写
   timeout: 5000,
 });
 

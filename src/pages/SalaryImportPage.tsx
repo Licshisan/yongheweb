@@ -1,12 +1,12 @@
 // SalaryImportPage.tsx
-import React, { useState, useEffect } from 'react';
-import { Upload, Button, Table, message, Progress } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
-import * as XLSX from 'xlsx';
-import { getSpecModels } from '../services/specModel';
-import { getWorkers } from '../services/workers';
-import { batchCreateWageLogs } from '../services/wageLogs';
-import { getProcesses } from '../services/processes';
+import React, { useState, useEffect } from "react";
+import { Upload, Button, Table, message, Progress } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
+import * as XLSX from "xlsx";
+import { getSpecModels } from "../services/specModel";
+import { getWorkers } from "../services/workers";
+import { batchCreateWageLogs } from "../services/wageLogs";
+import { getProcesses } from "../services/processes";
 
 interface SpecModel {
   id: number;
@@ -51,11 +51,11 @@ const SalaryImportPage: React.FC = () => {
           id: w.id,
           name: w.name,
           process_id: w.process?.id || 0,
-          process_name: w.process?.name || '',
+          process_name: w.process?.name || "",
         }));
         setAllWorkers(workersWithProcess);
       } catch (error) {
-        message.error('加载工人失败');
+        message.error("加载工人失败");
       }
     };
     loadAllWorkers();
@@ -68,7 +68,7 @@ const SalaryImportPage: React.FC = () => {
         const res = await getProcesses();
         setProcesses(res.processes);
       } catch (error) {
-        console.error('加载工序失败:', error);
+        console.error("加载工序失败:", error);
       }
     };
     loadProcesses();
@@ -87,7 +87,7 @@ const SalaryImportPage: React.FC = () => {
         }));
         setAllSpecModels(specs);
       } catch (error) {
-        message.error('加载规格工价失败');
+        message.error("加载规格工价失败");
       }
     };
     loadAllSpecModels();
@@ -104,30 +104,30 @@ const SalaryImportPage: React.FC = () => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const binaryStr = e.target?.result;
-      const workbook = XLSX.read(binaryStr, { type: 'binary' });
+      const workbook = XLSX.read(binaryStr, { type: "binary" });
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
       const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
       if (jsonData.length === 0) {
-        message.warning('Excel 文件内容为空');
+        message.warning("Excel 文件内容为空");
         return;
       }
 
       const headers = jsonData[0] as string[];
       const newHeaders = [...headers];
-      if (!newHeaders.includes('工人ID')) newHeaders.unshift('工人ID');
-      if (!newHeaders.includes('单价')) newHeaders.push('单价');
-      if (!newHeaders.includes('金额')) newHeaders.push('金额');
+      if (!newHeaders.includes("工人ID")) newHeaders.unshift("工人ID");
+      if (!newHeaders.includes("单价")) newHeaders.push("单价");
+      if (!newHeaders.includes("金额")) newHeaders.push("金额");
 
       const rows = jsonData.slice(1).map((row: any, index: number) => {
         const rowObj: any = { key: index };
         headers.forEach((header, i) => {
-          rowObj[header] = (row[i] ?? '').toString().trim();
+          rowObj[header] = (row[i] ?? "").toString().trim();
         });
-        rowObj['工人ID'] = 0;
-        rowObj['单价'] = 0;
-        rowObj['金额'] = 0;
+        rowObj["工人ID"] = 0;
+        rowObj["单价"] = 0;
+        rowObj["金额"] = 0;
         return rowObj;
       });
 
@@ -142,12 +142,12 @@ const SalaryImportPage: React.FC = () => {
   const checkWorkers = () => {
     let unmatchedCount = 0;
     const newData = data.map((row) => {
-      const worker = allWorkers.find((w) => w.name === row['工人']);
+      const worker = allWorkers.find((w) => w.name === row["工人"]);
       if (!worker) {
         unmatchedCount++;
-        return { ...row, _rowStatus: 'red', 工人ID: 0 };
+        return { ...row, _rowStatus: "red", 工人ID: 0 };
       }
-      return { ...row, _rowStatus: '', 工人ID: worker.id };
+      return { ...row, _rowStatus: "", 工人ID: worker.id };
     });
     setData(newData);
     message.info(`未匹配工人数：${unmatchedCount}`);
@@ -157,15 +157,15 @@ const SalaryImportPage: React.FC = () => {
   const checkPriceAndCompute = () => {
     let unmatchedCount = 0;
     const newData = data.map((row) => {
-      const price = findPrice(row['工序'], row['规格型号']);
-      const qty = Number(row['数量']) || 0;
-      const group = Number(row['组人数']) || 1;
+      const price = findPrice(row["工序"], row["规格型号"]);
+      const qty = Number(row["数量"]) || 0;
+      const group = Number(row["组人数"]) || 1;
       const amount = group === 0 ? 0 : (price * qty) / group;
 
       if (price === 0) unmatchedCount++;
       return {
         ...row,
-        _rowStatus: price === 0 ? 'red' : 'green',
+        _rowStatus: price === 0 ? "red" : "green",
         单价: Number(price.toFixed(2)),
         金额: Number(amount.toFixed(1)),
       };
@@ -178,7 +178,7 @@ const SalaryImportPage: React.FC = () => {
   const importToDB = async () => {
     try {
       if (data.length === 0) {
-        message.warning('没有可导入的数据');
+        message.warning("没有可导入的数据");
         return;
       }
 
@@ -193,15 +193,15 @@ const SalaryImportPage: React.FC = () => {
 
       for (let i = 0; i < data.length; i += batchSize) {
         const chunk = data.slice(i, i + batchSize).map((row) => ({
-          worker_id: allWorkers.find((w) => w.name === row['工人'])!.id, // 用 ! 确保非 null
-          process_id: processes.find((s) => s.name === row['工序'])!.id!,
-          spec_model_id: allSpecModels.find((s) => s.process_name === row['工序'] && s.name === row['规格型号'])!.id!,
-          date: row['日期'],
-          actual_price: Number(row['单价']),
-          quantity: Number(row['数量']),
-          actual_group_size: Number(row['组人数']),
-          total_wage: Number(row['金额']),
-          remark: row['备注'] || '',
+          worker_id: allWorkers.find((w) => w.name === row["工人"])!.id, // 用 ! 确保非 null
+          process_id: processes.find((s) => s.name === row["工序"])!.id!,
+          spec_model_id: allSpecModels.find((s) => s.process_name === row["工序"] && s.name === row["规格型号"])!.id!,
+          date: row["日期"],
+          actual_price: Number(row["单价"]),
+          quantity: Number(row["数量"]),
+          actual_group_size: Number(row["组人数"]),
+          total_wage: Number(row["金额"]),
+          remark: row["备注"] || "",
         }));
 
         console.log(`批量导入数据[${i}~${i + batchSize}]:`, chunk);
@@ -214,15 +214,15 @@ const SalaryImportPage: React.FC = () => {
         //message.info(`已导入 ${Math.min(i + batchSize, data.length)} / ${data.length}`);
       }
 
-      message.success('批量导入完成！');
+      message.success("批量导入完成！");
 
       // 2 秒后隐藏进度条
       setTimeout(() => {
         setProgress(0);
       }, 2000);
     } catch (error) {
-      console.error('批量导入失败：', error);
-      message.error('批量导入失败，请检查控制台');
+      console.error("批量导入失败：", error);
+      message.error("批量导入失败，请检查控制台");
     }
   };
 
@@ -234,10 +234,10 @@ const SalaryImportPage: React.FC = () => {
       {/* 顶部按钮区域：左右分布 */}
       <div
         style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          margin: '10px 0',
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          margin: "10px 0",
         }}
       >
         {/* 左侧：选择文件按钮 */}
@@ -265,7 +265,7 @@ const SalaryImportPage: React.FC = () => {
         dataSource={data}
         columns={columns}
         pagination={false}
-        rowClassName={(record) => (record._workerMatched === false || record._priceMatched === false ? 'row-red' : '')}
+        rowClassName={(record) => (record._workerMatched === false || record._priceMatched === false ? "row-red" : "")}
         style={{ marginTop: 20 }}
       />
     </div>

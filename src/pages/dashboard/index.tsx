@@ -1,16 +1,16 @@
-import React from 'react';
-import { Typography, Card } from 'antd';
+import React from "react";
+import { Typography, Card } from "antd";
 
 const DashboardPage: React.FC = () => {
   return (
     <>
       <Card
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100%',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100%",
         }}
       >
         <Typography.Title level={2} style={{ marginTop: -100 }}>
