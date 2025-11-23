@@ -1,8 +1,4 @@
-import {
-  EditableProTable,
-  ProColumns,
-  ProFormSelect,
-} from '@ant-design/pro-components';
+import { EditableProTable, ProColumns, ProFormSelect } from '@ant-design/pro-components';
 import { DatePicker, notification } from 'antd';
 import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { getWorkers, getWorkersBySearchDate } from '../services/workers';
@@ -36,8 +32,8 @@ interface Worker {
   group: string;
   process_id: number;
   process_name: string;
-  entry_date:string;
-  leave_date:string;
+  entry_date: string;
+  leave_date: string;
   status: string;
 }
 
@@ -47,7 +43,6 @@ interface SpecModel {
   price: number;
   process_id: number;
 }
-
 
 interface Process {
   id: number;
@@ -61,7 +56,7 @@ const WageLogPage: React.FC = () => {
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [allWorkers, setAllWorkers] = useState<Worker[]>([]);
   const [processes, setProcesses] = useState<Process[]>([]);
-  const [dataSource, setDataSource] = useState<WageLog[]>([]);   //工资记录数据
+  const [dataSource, setDataSource] = useState<WageLog[]>([]); //工资记录数据
   const [allSpecModels, setAllSpecModels] = useState<SpecModel[]>([]);
 
   // 搜索条件状态
@@ -80,30 +75,29 @@ const WageLogPage: React.FC = () => {
   }, [dataSource, filterWorker, filterProcess, filterDate]);
 
   // 加载工人
-    useEffect(() => {
-      const loadAllWorkers = async () => {
-        try {
-          const res = await getWorkers();
-          //console.log(res);
-          const workersWithProcessName = res.data.workers.map((w: any) => ({
-            ...w,
-            process_name: w.process.name || '',
-            process_id: w.process.id || '',
-          }));
-          //console.log("所有工人记录：", workersWithProcessName);
-          setAllWorkers(workersWithProcessName);
-        } catch (error) {
-          console.error('加载工人失败:', error);
-        }
-      };
-      loadAllWorkers();
-    }, []);
+  useEffect(() => {
+    const loadAllWorkers = async () => {
+      try {
+        const res = await getWorkers();
+        //console.log(res);
+        const workersWithProcessName = res.data.workers.map((w: any) => ({
+          ...w,
+          process_name: w.process.name || '',
+          process_id: w.process.id || '',
+        }));
+        //console.log("所有工人记录：", workersWithProcessName);
+        setAllWorkers(workersWithProcessName);
+      } catch (error) {
+        console.error('加载工人失败:', error);
+      }
+    };
+    loadAllWorkers();
+  }, []);
 
   // 加载工人  加载所有在查询日期里没有离职的工人
   useEffect(() => {
     const loadWorkers = async () => {
       try {
-        
         const res = await getWorkersBySearchDate(filterDate);
         //console.log('res:',res);
         const workersWithProcessName = res.workers.map((w: any) => ({
@@ -113,7 +107,6 @@ const WageLogPage: React.FC = () => {
         }));
         //console.log("所有工人记录：", workersWithProcessName);
         setWorkers(workersWithProcessName);
-        
       } catch (error) {
         console.error('加载工人失败:', error);
       }
@@ -122,40 +115,37 @@ const WageLogPage: React.FC = () => {
   }, [filterDate]);
 
   // 加载工序
-    useEffect(() => {
-      const loadProcesses = async () => {
-        try {
-          const res = await getProcesses();
-          setProcesses(res.processes);
-        } catch (error) {
-          console.error('加载工序失败:', error);
-        }
-      };
-      loadProcesses();
-    }, []);
+  useEffect(() => {
+    const loadProcesses = async () => {
+      try {
+        const res = await getProcesses();
+        setProcesses(res.processes);
+      } catch (error) {
+        console.error('加载工序失败:', error);
+      }
+    };
+    loadProcesses();
+  }, []);
 
   //加载所有规格
-    useEffect(() => {
-      const loadAllSpecModels = async () => {
-        const res = await getSpecModels();
-        //console.log("所有规格：", res);
-        setAllSpecModels(res.specModels);
-      };
-      loadAllSpecModels();
-    }, []);
+  useEffect(() => {
+    const loadAllSpecModels = async () => {
+      const res = await getSpecModels();
+      //console.log("所有规格：", res);
+      setAllSpecModels(res.specModels);
+    };
+    loadAllSpecModels();
+  }, []);
 
   // 加载工资记录
   useEffect(() => {
     if (workers.length === 0) return;
     const loadWageLog = async () => {
-      
       const wageRes = await getWageLogsByDate(filterDate);
       const wageLogs: WageLog[] = wageRes.wage_logs || [];
       // 获取已有工资记录的工人 ID 集合
-      const recordedWorkerIds = new Set<number>(
-        wageLogs.map((log: WageLog) => log.worker_id)
-      );
-  
+      const recordedWorkerIds = new Set<number>(wageLogs.map((log: WageLog) => log.worker_id));
+
       //const today = dayjs().format('YYYY-MM-DD');
       // 创建未记录工人的空记录
       const missingLogs: WageLog[] = workers
@@ -164,11 +154,11 @@ const WageLogPage: React.FC = () => {
           id: Date.now() + worker.id, // 确保唯一
           //isNew: true,
           worker_id: worker.id,
-          worker:worker.name,
+          worker: worker.name,
           process_id: worker.process_id,
-          process:worker.process_name,
+          process: worker.process_name,
           spec_model_id: 0,
-          spec_model:'',
+          spec_model: '',
           actual_price: 0,
           actual_group_size: 1,
           quantity: 0,
@@ -177,16 +167,13 @@ const WageLogPage: React.FC = () => {
           date: filterDate,
           remark: '',
         }));
-      //console.log("补足不在工资记录上的工人后的信息:", [...wageLogs, ...missingLogs]);  
+      //console.log("补足不在工资记录上的工人后的信息:", [...wageLogs, ...missingLogs]);
       setDataSource([...wageLogs, ...missingLogs]);
     };
-  
-    loadWageLog();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ workers]);
-  
 
- 
+    loadWageLog();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workers]);
 
   const columns: ProColumns<WageLog>[] = [
     {
@@ -202,7 +189,7 @@ const WageLogPage: React.FC = () => {
       formItemProps: { rules: [{ required: true }] },
       fieldProps: (form, config) => ({
         showSearch: true,
-        filterOption: (input: string, option: { label: any; }) =>
+        filterOption: (input: string, option: { label: any }) =>
           (option?.label ?? '').toLowerCase().includes(input.toLowerCase()),
         onChange: (value) => {
           const rowKey = config?.rowKey;
@@ -220,8 +207,8 @@ const WageLogPage: React.FC = () => {
       }),
       width: '7%',
       align: 'center', // 设置内容居中
-    },   
-    
+    },
+
     {
       title: '工序',
       dataIndex: 'process_id',
@@ -235,7 +222,7 @@ const WageLogPage: React.FC = () => {
       formItemProps: { rules: [{ required: true }] },
       fieldProps: (form, config) => ({
         showSearch: true,
-        filterOption: (input: string, option: { label: any; }) =>
+        filterOption: (input: string, option: { label: any }) =>
           (option?.label ?? '').toLowerCase().includes(input.toLowerCase()),
         onChange: (value) => {
           const rowKey = config?.rowKey;
@@ -249,7 +236,7 @@ const WageLogPage: React.FC = () => {
           }
         },
       }),
-      align: 'center', 
+      align: 'center',
     },
     {
       title: '规格型号',
@@ -267,34 +254,34 @@ const WageLogPage: React.FC = () => {
             label: item.name,
             value: item.id,
           }));
-    
-          return {
-            showSearch: true,
-            filterOption: (input: string, option: { label: any; }) =>
-              (option?.label ?? '').toLowerCase().includes(input.toLowerCase()),
-            options,
-            onChange: (value: number) => {
-              const spec = allSpecModels.find((item) => item.id === value);
-              if (spec) {
-                const rowKey = String(config.rowKey);
-                const quantity = form?.getFieldValue?.([rowKey, 'quantity']) ?? 0;
-                const total = parseFloat((spec.price * quantity).toFixed(2));
-          
-                form?.setFieldsValue({
-                  [rowKey]: {
-                    actual_price: spec.price,
-                    total_wage: total,
-                  },
-                });
-              }
-            },
-          };
+
+        return {
+          showSearch: true,
+          filterOption: (input: string, option: { label: any }) =>
+            (option?.label ?? '').toLowerCase().includes(input.toLowerCase()),
+          options,
+          onChange: (value: number) => {
+            const spec = allSpecModels.find((item) => item.id === value);
+            if (spec) {
+              const rowKey = String(config.rowKey);
+              const quantity = form?.getFieldValue?.([rowKey, 'quantity']) ?? 0;
+              const total = parseFloat((spec.price * quantity).toFixed(2));
+
+              form?.setFieldsValue({
+                [rowKey]: {
+                  actual_price: spec.price,
+                  total_wage: total,
+                },
+              });
+            }
+          },
+        };
       },
       render: (_, record) => {
         const spec = allSpecModels.find((item) => item.id === Number(record.spec_model_id));
         return spec ? spec.name : '-';
       },
-      align: 'center', 
+      align: 'center',
     },
     {
       title: '工价',
@@ -307,7 +294,7 @@ const WageLogPage: React.FC = () => {
           onChange: (value: number) => {
             const quantity = form?.getFieldValue?.([rowKey, 'quantity']) || 0;
             const actual_group_size = form?.getFieldValue?.([rowKey, 'actual_group_size']) || 0;
-            const total = parseFloat((value * quantity / actual_group_size).toFixed(1));
+            const total = parseFloat(((value * quantity) / actual_group_size).toFixed(1));
             form?.setFieldsValue?.({
               [rowKey]: {
                 total_wage: total,
@@ -316,7 +303,7 @@ const WageLogPage: React.FC = () => {
           },
         };
       },
-      align: 'center', 
+      align: 'center',
     },
     {
       title: '数量',
@@ -329,7 +316,7 @@ const WageLogPage: React.FC = () => {
           onChange: (value: number) => {
             const actual_price = form?.getFieldValue?.([rowKey, 'actual_price']) || 0;
             const actual_group_size = form?.getFieldValue?.([rowKey, 'actual_group_size']) || 0;
-            const total = parseFloat((value * actual_price / actual_group_size).toFixed(1));
+            const total = parseFloat(((value * actual_price) / actual_group_size).toFixed(1));
             form?.setFieldsValue?.({
               [rowKey]: {
                 total_wage: total,
@@ -338,7 +325,7 @@ const WageLogPage: React.FC = () => {
           },
         };
       },
-      align: 'center', 
+      align: 'center',
     },
     {
       title: '组人数',
@@ -351,7 +338,7 @@ const WageLogPage: React.FC = () => {
           onChange: (value: number) => {
             const actual_price = form?.getFieldValue?.([rowKey, 'actual_price']) || 0;
             const quantity = form?.getFieldValue?.([rowKey, 'quantity']) || 0;
-            const total = parseFloat((actual_price * quantity / value).toFixed(1));
+            const total = parseFloat(((actual_price * quantity) / value).toFixed(1));
             form?.setFieldsValue?.({
               [rowKey]: {
                 total_wage: total,
@@ -360,7 +347,7 @@ const WageLogPage: React.FC = () => {
           },
         };
       },
-      align: 'center', 
+      align: 'center',
     },
     /** 
     {
@@ -374,15 +361,15 @@ const WageLogPage: React.FC = () => {
       dataIndex: 'total_wage',
       valueType: 'digit',
       ///renderText: (_: any, row: WageLog) =>
-       // (row.actual_price * row.quantity/ row.actual_group_size).toFixed(2),
-      align: 'center', 
+      // (row.actual_price * row.quantity/ row.actual_group_size).toFixed(2),
+      align: 'center',
     },
     {
       title: '日期',
       dataIndex: 'date',
       valueType: 'date',
       initialValue: filterDate,
-      align: 'center', 
+      align: 'center',
     },
     {
       title: '备注',
@@ -418,11 +405,8 @@ const WageLogPage: React.FC = () => {
                 return;
               }
             }
-            if(hasRecord)
-              deleteWageLog(record.id);
-            setDataSource((prev) =>
-              prev.filter((item) => item.id !== record.id)
-            );
+            if (hasRecord) deleteWageLog(record.id);
+            setDataSource((prev) => prev.filter((item) => item.id !== record.id));
           }}
         >
           删除
@@ -433,11 +417,18 @@ const WageLogPage: React.FC = () => {
 
   return (
     <>
-      <div style={{ marginBottom: 26, display: 'flex', gap: 16, alignItems: 'center' }}>
+      <div
+        style={{
+          marginBottom: 26,
+          display: 'flex',
+          gap: 16,
+          alignItems: 'center',
+        }}
+      >
         <ProFormSelect
           name="worker"
           label="工人"
-          options={workers.map(item => ({
+          options={workers.map((item) => ({
             label: item.name,
             value: item.id,
           }))}
@@ -456,7 +447,7 @@ const WageLogPage: React.FC = () => {
         <ProFormSelect
           name="process"
           label="工序"
-          options={processes.map(item => ({
+          options={processes.map((item) => ({
             label: item.name,
             value: item.id,
           }))}
@@ -473,17 +464,14 @@ const WageLogPage: React.FC = () => {
           }}
         />
         <DatePicker
-          style={{ width: 200 }}  // 设置固定宽度，避免过长
+          style={{ width: 200 }} // 设置固定宽度，避免过长
           placeholder="选择日期"
-
           value={dayjs(filterDate)}
           onChange={(_, dateString) => {
             if (typeof dateString === 'string') setFilterDate(dateString);
           }}
         />
       </div>
-
-
 
       <EditableProTable<WageLog>
         //headerTitle="工资记录"
@@ -497,13 +485,13 @@ const WageLogPage: React.FC = () => {
           editableKeys,
           onChange: setEditableRowKeys,
           onSave: async (_, record) => {
-            console.log("编辑表存时record数据:", record);
+            console.log('编辑表存时record数据:', record);
             const updatedRow = {
               ...record,
             };
             const newData = [...dataSource];
             const index = newData.findIndex((item) => item.id === record.id);
-            
+
             let hasRecord = false;
             try {
               await getWageLogById(record.id);
@@ -517,7 +505,8 @@ const WageLogPage: React.FC = () => {
               }
             }
 
-            if (index > -1 && hasRecord) {//如果是编辑数据
+            if (index > -1 && hasRecord) {
+              //如果是编辑数据
               const updateToDatabase = {
                 id: updatedRow.id,
                 worker_id: updatedRow.worker_id,
@@ -528,13 +517,14 @@ const WageLogPage: React.FC = () => {
                 actual_group_size: updatedRow.actual_group_size,
                 quantity: updatedRow.quantity,
                 total_wage: updatedRow.total_wage,
-                remark: updatedRow.remark
+                remark: updatedRow.remark,
                 //created_at?: string;
                 //updated_at?: string;
-              }
+              };
               updateWageLog(updateToDatabase.id, updateToDatabase);
               newData[index] = updatedRow;
-            } else {//如果是新增数据
+            } else {
+              //如果是新增数据
               const addToDatabase = {
                 //id: updatedRow.id,
                 worker_id: updatedRow.worker_id,
@@ -545,13 +535,12 @@ const WageLogPage: React.FC = () => {
                 actual_group_size: updatedRow.actual_group_size,
                 quantity: updatedRow.quantity,
                 total_wage: updatedRow.total_wage,
-                remark: updatedRow.remark
-                
-              }
+                remark: updatedRow.remark,
+              };
               createWageLog(addToDatabase);
               newData.push(updatedRow);
             }
-            
+
             //updateWageLog(updateToDatabase.id, updateToDatabase);
             setDataSource(newData);
             notification.success({ message: '保存成功' });
@@ -562,7 +551,7 @@ const WageLogPage: React.FC = () => {
           record: () => ({
             id: Date.now(),
             worker: '',
-            worker_id:0,
+            worker_id: 0,
             process: '',
             process_id: 0,
             //spec_model: '',

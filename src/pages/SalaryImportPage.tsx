@@ -24,11 +24,10 @@ interface Worker {
 }
 
 interface Process {
-    id: number;
-    name: string;
-    description: string;
-  }
-  
+  id: number;
+  name: string;
+  description: string;
+}
 
 const styles = `
   .row-green { background-color: #d9f7be !important; }
@@ -63,18 +62,18 @@ const SalaryImportPage: React.FC = () => {
   }, []);
 
   // 加载工序
-      useEffect(() => {
-        const loadProcesses = async () => {
-          try {
-            const res = await getProcesses();
-            setProcesses(res.processes);
-          } catch (error) {
-            console.error('加载工序失败:', error);
-          }
-        };
-        loadProcesses();
-      }, []);
-  
+  useEffect(() => {
+    const loadProcesses = async () => {
+      try {
+        const res = await getProcesses();
+        setProcesses(res.processes);
+      } catch (error) {
+        console.error('加载工序失败:', error);
+      }
+    };
+    loadProcesses();
+  }, []);
+
   // 加载规格和工价
   useEffect(() => {
     const loadAllSpecModels = async () => {
@@ -96,9 +95,7 @@ const SalaryImportPage: React.FC = () => {
 
   // 查找工价
   const findPrice = (processName: string, specName: string): number => {
-    const item = allSpecModels.find(
-      (spec) => spec.process_name === processName && spec.name === specName
-    );
+    const item = allSpecModels.find((spec) => spec.process_name === processName && spec.name === specName);
     return item ? Number(item.price) : 0;
   };
 
@@ -148,9 +145,9 @@ const SalaryImportPage: React.FC = () => {
       const worker = allWorkers.find((w) => w.name === row['工人']);
       if (!worker) {
         unmatchedCount++;
-        return { ...row, _rowStatus: 'red', '工人ID': 0 };
+        return { ...row, _rowStatus: 'red', 工人ID: 0 };
       }
-      return { ...row, _rowStatus: '', '工人ID': worker.id };
+      return { ...row, _rowStatus: '', 工人ID: worker.id };
     });
     setData(newData);
     message.info(`未匹配工人数：${unmatchedCount}`);
@@ -169,8 +166,8 @@ const SalaryImportPage: React.FC = () => {
       return {
         ...row,
         _rowStatus: price === 0 ? 'red' : 'green',
-        '单价': Number(price.toFixed(2)),
-        '金额': Number(amount.toFixed(1)),
+        单价: Number(price.toFixed(2)),
+        金额: Number(amount.toFixed(1)),
       };
     });
     setData(newData);
@@ -184,31 +181,31 @@ const SalaryImportPage: React.FC = () => {
         message.warning('没有可导入的数据');
         return;
       }
-  
+
       const batchSize = 500; // 分批提交
       const totalBatches = Math.ceil(data.length / batchSize);
-  
+
       // 建立映射，加快查找
       const workerMap = Object.fromEntries(allWorkers.map((w) => [w.name, w.id]));
       const specMap = Object.fromEntries(
-        allSpecModels.map((s) => [`${s.process_name}_${s.name}`, { id: s.id, process_id: s.process_id }])
+        allSpecModels.map((s) => [`${s.process_name}_${s.name}`, { id: s.id, process_id: s.process_id }]),
       );
-  
+
       for (let i = 0; i < data.length; i += batchSize) {
         const chunk = data.slice(i, i + batchSize).map((row) => ({
-            worker_id: allWorkers.find((w) => w.name === row['工人'])!.id, // 用 ! 确保非 null
-            process_id: processes.find((s) => s.name === row['工序'])!.id!,
-            spec_model_id: allSpecModels.find((s) => s.process_name === row['工序'] && s.name === row['规格型号'])!.id!,
-            date: row['日期'],
-            actual_price: Number(row['单价']),
-            quantity: Number(row['数量']),
-            actual_group_size: Number(row['组人数']),
-            total_wage: Number(row['金额']),
-            remark: row['备注'] || '',
-          }));
-  
+          worker_id: allWorkers.find((w) => w.name === row['工人'])!.id, // 用 ! 确保非 null
+          process_id: processes.find((s) => s.name === row['工序'])!.id!,
+          spec_model_id: allSpecModels.find((s) => s.process_name === row['工序'] && s.name === row['规格型号'])!.id!,
+          date: row['日期'],
+          actual_price: Number(row['单价']),
+          quantity: Number(row['数量']),
+          actual_group_size: Number(row['组人数']),
+          total_wage: Number(row['金额']),
+          remark: row['备注'] || '',
+        }));
+
         console.log(`批量导入数据[${i}~${i + batchSize}]:`, chunk);
-  
+
         // 调用批量创建接口
         await batchCreateWageLogs(chunk);
         // 更新进度百分比
@@ -216,7 +213,7 @@ const SalaryImportPage: React.FC = () => {
         setProgress(percent);
         //message.info(`已导入 ${Math.min(i + batchSize, data.length)} / ${data.length}`);
       }
-  
+
       message.success('批量导入完成！');
 
       // 2 秒后隐藏进度条
@@ -231,48 +228,47 @@ const SalaryImportPage: React.FC = () => {
 
   return (
     <div style={{ padding: 20 }}>
-        <style>{styles}</style>
-        <h2>薪资导入（前台解析+批量导入）</h2>
+      <style>{styles}</style>
+      <h2>薪资导入（前台解析+批量导入）</h2>
 
-        {/* 顶部按钮区域：左右分布 */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '10px 0' }}>
-            {/* 左侧：选择文件按钮 */}
-            <Upload
-            beforeUpload={handleFile}
-            accept=".xlsx,.xls"
-            maxCount={1}
-            showUploadList={false}
-            >
-            <Button icon={<UploadOutlined />}>选择 Excel 文件</Button>
-            </Upload>
+      {/* 顶部按钮区域：左右分布 */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          margin: '10px 0',
+        }}
+      >
+        {/* 左侧：选择文件按钮 */}
+        <Upload beforeUpload={handleFile} accept=".xlsx,.xls" maxCount={1} showUploadList={false}>
+          <Button icon={<UploadOutlined />}>选择 Excel 文件</Button>
+        </Upload>
 
-            {/* 右侧：三个操作按钮 */}
-            <div>
-            <Button type="primary" onClick={checkWorkers} style={{ marginRight: 10 }}>
-                核查人员
-            </Button>
-            <Button type="primary" onClick={checkPriceAndCompute} style={{ marginRight: 10 }}>
-                核查单价并计算薪资
-            </Button>
-            <Button type="primary" onClick={importToDB}>
-                批量导入到数据库
-            </Button>
-            </div>
+        {/* 右侧：三个操作按钮 */}
+        <div>
+          <Button type="primary" onClick={checkWorkers} style={{ marginRight: 10 }}>
+            核查人员
+          </Button>
+          <Button type="primary" onClick={checkPriceAndCompute} style={{ marginRight: 10 }}>
+            核查单价并计算薪资
+          </Button>
+          <Button type="primary" onClick={importToDB}>
+            批量导入到数据库
+          </Button>
         </div>
+      </div>
 
-        {progress > 0 && <Progress percent={progress} />}
+      {progress > 0 && <Progress percent={progress} />}
 
-        <Table
-            dataSource={data}
-            columns={columns}
-            pagination={false}
-            rowClassName={(record) =>
-            record._workerMatched === false || record._priceMatched === false ? 'row-red' : ''
-            }
-            style={{ marginTop: 20 }}
-        />
+      <Table
+        dataSource={data}
+        columns={columns}
+        pagination={false}
+        rowClassName={(record) => (record._workerMatched === false || record._priceMatched === false ? 'row-red' : '')}
+        style={{ marginTop: 20 }}
+      />
     </div>
-
   );
 };
 

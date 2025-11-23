@@ -79,7 +79,7 @@ const WageLogSearchPage: React.FC = () => {
     };
     loadWorkers();
   }, []);
-  
+
   // 加载工序
   useEffect(() => {
     const loadProcesses = async () => {
@@ -127,97 +127,103 @@ const WageLogSearchPage: React.FC = () => {
   // 导出数据到Excel表中
   const exportToExcel = () => {
     if (!dataSource.length) return;
-  
+
     // 获取所有日期（升序）
-    const allDates = Array.from(new Set(dataSource.map(item => item.date))).sort();
-  
+    const allDates = Array.from(new Set(dataSource.map((item) => item.date))).sort();
+
     // 获取所有工人
-    const allWorkers = Array.from(new Set(dataSource.map(item => item.worker)));
-  
+    const allWorkers = Array.from(new Set(dataSource.map((item) => item.worker)));
+
     // 构造表格数据
     const data: any[] = [];
-  
-    allWorkers.forEach(worker => {
+
+    allWorkers.forEach((worker) => {
       const row: any = { 工人: worker };
       let total = 0;
-  
-      allDates.forEach(date => {
-        const logs = dataSource.filter(item => item.worker === worker && item.date === date);
+
+      allDates.forEach((date) => {
+        const logs = dataSource.filter((item) => item.worker === worker && item.date === date);
         const wage = logs.reduce((sum, item) => sum + item.total_wage, 0);
         row[date] = wage;
         total += wage;
       });
-  
+
       row['工资合计'] = total;
       data.push(row);
     });
-  
+
     // 创建 worksheet 和 workbook
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, '工资报表');
-  
+
     // 获取文件名
     const start = form.getFieldValue('dateRange')?.[0]?.format('YYYY-MM-DD') || '';
     const end = form.getFieldValue('dateRange')?.[1]?.format('YYYY-MM-DD') || '';
     const filename = `工资报表_${start}_${end}.xlsx`;
-  
+
     // 导出
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'array',
+    });
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(blob, filename);
   };
-  
+
   // 导出查询记录
   const exportToExcelDaily = () => {
     if (!dataSource.length) return;
-  
-    const allDates = Array.from(new Set(dataSource.map(item => item.date))).sort();
-    const allWorkers = Array.from(new Set(dataSource.map(item => item.worker)));
-  
+
+    const allDates = Array.from(new Set(dataSource.map((item) => item.date))).sort();
+    const allWorkers = Array.from(new Set(dataSource.map((item) => item.worker)));
+
     const data: any[] = [];
-  
-    allWorkers.forEach(worker => {
+
+    allWorkers.forEach((worker) => {
       const row: any = { 工人: worker };
       let total = 0;
-  
-      allDates.forEach(date => {
-        const logs = dataSource.filter(item => item.worker === worker && item.date === date);
+
+      allDates.forEach((date) => {
+        const logs = dataSource.filter((item) => item.worker === worker && item.date === date);
         const wage = logs.reduce((sum, item) => sum + item.total_wage, 0);
         row[date] = wage;
         total += wage;
       });
-  
+
       row['工资合计'] = total;
       data.push(row);
     });
-  
+
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, '工资日薪表');
-  
+
     const start = form.getFieldValue('dateRange')?.[0]?.format('YYYY-MM-DD') || '';
     const end = form.getFieldValue('dateRange')?.[1]?.format('YYYY-MM-DD') || '';
     const filename = `工资报表_${start}_${end}.xlsx`;
-  
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'array',
+    });
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(blob, filename);
   };
-  
+
   // 导出前查询记录排序
   const exportToExcelRaw = () => {
     if (!dataSource.length) return;
-  
+
     // 按工人 → 日期 排序
     const sortedData = [...dataSource].sort((a, b) => {
       if (a.worker < b.worker) return -1;
       if (a.worker > b.worker) return 1;
       return a.date.localeCompare(b.date);
     });
-  
+
     // 转换为导出格式
-    const exportData = sortedData.map(item => ({
+    const exportData = sortedData.map((item) => ({
       工人: item.worker,
       工序: item.process,
       组人数: item.actual_group_size,
@@ -228,62 +234,90 @@ const WageLogSearchPage: React.FC = () => {
       工资: item.total_wage,
       备注: item.remark || '',
     }));
-  
+
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, '工资记录');
-  
+
     const start = form.getFieldValue('dateRange')?.[0]?.format('YYYY-MM-DD') || '';
     const end = form.getFieldValue('dateRange')?.[1]?.format('YYYY-MM-DD') || '';
     const filename = `查询记录_${start}_${end}.xlsx`;
-  
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'array',
+    });
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(blob, filename);
   };
-  
 
   const columns: ProColumns<WageLog>[] = [
-    { 
-      title: '日期', 
-      dataIndex: 'date', 
-      valueType: 'text', 
-      align: 'center', 
+    {
+      title: '日期',
+      dataIndex: 'date',
+      valueType: 'text',
+      align: 'center',
       width: 120,
       //sorter: (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
       sortDirections: ['ascend', 'descend'],
-      sorter: { compare: (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(), multiple: 1 }
+      sorter: {
+        compare: (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+        multiple: 1,
+      },
     },
-    { 
-      title: '工人', 
-      dataIndex: 'worker', 
-      valueType: 'text', 
+    {
+      title: '工人',
+      dataIndex: 'worker',
+      valueType: 'text',
       align: 'center',
-      sorter: { compare: (a, b) => a.worker.localeCompare(b.worker, 'zh'), multiple: 2 }
+      sorter: {
+        compare: (a, b) => a.worker.localeCompare(b.worker, 'zh'),
+        multiple: 2,
+      },
     },
-    { 
-      title: '工序', 
-      dataIndex: 'process', 
-      valueType: 'text', 
+    {
+      title: '工序',
+      dataIndex: 'process',
+      valueType: 'text',
       align: 'center',
-      sorter: { compare: (a, b) => a.process.localeCompare(b.process, 'zh'), multiple: 3 }
+      sorter: {
+        compare: (a, b) => a.process.localeCompare(b.process, 'zh'),
+        multiple: 3,
+      },
     },
-    { 
-      title: '规格型号', 
-      dataIndex: 'spec_model', 
-      valueType: 'text', 
+    {
+      title: '规格型号',
+      dataIndex: 'spec_model',
+      valueType: 'text',
       align: 'center',
-      sorter: { compare: (a, b) => a.spec_model.localeCompare(b.spec_model, 'zh'), multiple: 4 }
+      sorter: {
+        compare: (a, b) => a.spec_model.localeCompare(b.spec_model, 'zh'),
+        multiple: 4,
+      },
     },
-    { title: '单价', dataIndex: 'actual_price', valueType: 'money', align: 'center', width: 120 },
+    {
+      title: '单价',
+      dataIndex: 'actual_price',
+      valueType: 'money',
+      align: 'center',
+      width: 120,
+    },
     { title: '数量', dataIndex: 'quantity', align: 'center', width: 80 },
-    { title: '组人数', dataIndex: 'actual_group_size', align: 'center', width: 80 },
-    { title: '工资', dataIndex: 'total_wage', valueType: 'money', align: 'center', width: 120 },
+    {
+      title: '组人数',
+      dataIndex: 'actual_group_size',
+      align: 'center',
+      width: 80,
+    },
+    {
+      title: '工资',
+      dataIndex: 'total_wage',
+      valueType: 'money',
+      align: 'center',
+      width: 120,
+    },
     { title: '备注', dataIndex: 'remark', align: 'center' },
   ];
-  
-  
-
 
   return (
     <div>
@@ -306,10 +340,8 @@ const WageLogSearchPage: React.FC = () => {
             showSearch
             placeholder="请输入工人姓名"
             style={{ width: 200 }}
-            filterOption={(input, option) =>
-              (option?.label as string)?.toLowerCase().includes(input.toLowerCase())
-            }
-            options={workers.map(item => ({
+            filterOption={(input, option) => (option?.label as string)?.toLowerCase().includes(input.toLowerCase())}
+            options={workers.map((item) => ({
               label: item.name,
               value: item.id,
             }))}
@@ -317,33 +349,43 @@ const WageLogSearchPage: React.FC = () => {
           />
         </Form.Item>
         <Form.Item name="process_id" label="工序">
-          <Select 
+          <Select
             showSearch
-            placeholder="选择工序" 
-            style={{ width: 160 }} 
-            filterOption={(input, option) =>
-              (option?.label as string)?.toLowerCase().includes(input.toLowerCase())
-            }
-            options={processes.map(item => ({
+            placeholder="选择工序"
+            style={{ width: 160 }}
+            filterOption={(input, option) => (option?.label as string)?.toLowerCase().includes(input.toLowerCase())}
+            options={processes.map((item) => ({
               label: item.name,
               value: item.id,
-            }))} 
-            allowClear 
+            }))}
+            allowClear
           />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit">查询</Button>
+          <Button type="primary" htmlType="submit">
+            查询
+          </Button>
         </Form.Item>
       </Form>
 
-      <div style={{ display: 'flex', alignItems: 'center', marginTop: 16, marginBottom: 16 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          marginTop: 16,
+          marginBottom: 16,
+        }}
+      >
         <Statistic title="工资总和" value={totalWage} precision={2} prefix="¥" />
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-          <Button onClick={exportToExcelDaily} type="default">导出日薪工资记录</Button>
-          <Button onClick={exportToExcelRaw} type="default">导出查询记录</Button>
+          <Button onClick={exportToExcelDaily} type="default">
+            导出日薪工资记录
+          </Button>
+          <Button onClick={exportToExcelRaw} type="default">
+            导出查询记录
+          </Button>
         </div>
       </div>
-
 
       <ProTable<WageLog>
         columns={columns}

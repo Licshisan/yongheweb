@@ -1,7 +1,7 @@
 import request from '../utils/request';
 
 export async function login(username: string, password: string) {
-  try{
+  try {
     const res = await request.post('/user/login', { username, password });
     return res.data;
   } catch (error) {

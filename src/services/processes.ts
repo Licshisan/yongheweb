@@ -11,7 +11,7 @@ export interface Process {
 export const getProcesses = async () => {
   try {
     const response = await request.get('/api/processes/');
-    return response.data;  // 假设返回的数据中包含 processes 数组
+    return response.data; // 假设返回的数据中包含 processes 数组
   } catch (error) {
     console.error('获取工序列表失败:', error);
     throw error;
@@ -22,7 +22,7 @@ export const getProcesses = async () => {
 export const createProcess = async (processData: Omit<Process, 'id'>) => {
   try {
     const response = await request.post('/api/processes/', processData);
-    return response.data;  // 返回新创建的工序数据
+    return response.data; // 返回新创建的工序数据
   } catch (error) {
     console.error('创建工序失败:', error);
     throw error;
@@ -33,7 +33,7 @@ export const createProcess = async (processData: Omit<Process, 'id'>) => {
 export const updateProcess = async (id: number, processData: Partial<Process>) => {
   try {
     const response = await request.put(`/api/processes/${id}`, processData);
-    return response.data;  // 返回更新后的工序数据
+    return response.data; // 返回更新后的工序数据
   } catch (error) {
     console.error('更新工序失败:', error);
     throw error;
@@ -44,7 +44,7 @@ export const updateProcess = async (id: number, processData: Partial<Process>) =
 export const deleteProcess = async (id: number) => {
   try {
     const response = await request.delete(`/api/processes/${id}`);
-    return response.data;  // 返回删除操作的结果
+    return response.data; // 返回删除操作的结果
   } catch (error) {
     console.error('删除工序失败:', error);
     throw error;

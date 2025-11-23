@@ -1,4 +1,3 @@
-
 import request from '../utils/request';
 
 // 规格型号接口
@@ -7,7 +6,7 @@ export interface SpecModel {
   name: string;
   category: string;
   process_id: number;
-  price:number;
+  price: number;
 }
 
 // 获取所有规格型号
@@ -54,14 +53,13 @@ export const deleteSpecModel = async (id: number) => {
   }
 };
 
-
 // 获取指定工序下的所有规格型号
 export const getSpecModelsByProcess = async (processId: number) => {
-    try {
-      const response = await request.get(`/api/specmodels/by_process/${processId}`);
-      return response.data; // 假设返回的数据结构是 { spec_models: SpecModel[] }
-    } catch (error) {
-      console.error('获取指定工序的规格型号失败:', error);
-      throw error;
-    }
-  };
+  try {
+    const response = await request.get(`/api/specmodels/by_process/${processId}`);
+    return response.data; // 假设返回的数据结构是 { spec_models: SpecModel[] }
+  } catch (error) {
+    console.error('获取指定工序的规格型号失败:', error);
+    throw error;
+  }
+};

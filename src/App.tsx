@@ -9,8 +9,8 @@ import MainLayout from './components/MainLayout';
 import DashboardPage from './pages/dashboard';
 import WorkerListPage from './pages/worker/list';
 import WorkerCreatePage from './pages/worker/create';
-import ProcessListPage from "./pages/process/list";
-import ProcessCreatePage from "./pages/process/create";
+import ProcessListPage from './pages/process/list';
+import ProcessCreatePage from './pages/process/create';
 
 function App() {
   return (

@@ -87,8 +87,8 @@ const SpecModelPage: React.FC = () => {
 
   // 导出 Excel
   const handleExport = () => {
-    const exportData = filteredSpecModels.map(spec => {
-      const process = processes.find(p => p.id === spec.process_id);
+    const exportData = filteredSpecModels.map((spec) => {
+      const process = processes.find((p) => p.id === spec.process_id);
       return {
         规格名称: spec.name,
         分类: spec.category,
@@ -101,7 +101,10 @@ const SpecModelPage: React.FC = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, '规格型号');
 
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'array',
+    });
     const data = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(data, '规格型号.xlsx');
   };
@@ -122,8 +125,12 @@ const SpecModelPage: React.FC = () => {
       title: '操作',
       render: (_: any, spec: SpecModel) => (
         <div>
-          <Button type="link" onClick={() => handleEdit(spec)}>编辑</Button>
-          <Button type="link" danger onClick={() => handleDelete(spec.id)}>删除</Button>
+          <Button type="link" onClick={() => handleEdit(spec)}>
+            编辑
+          </Button>
+          <Button type="link" danger onClick={() => handleDelete(spec.id)}>
+            删除
+          </Button>
         </div>
       ),
     },
@@ -140,18 +147,16 @@ const SpecModelPage: React.FC = () => {
           style={{ width: 300, marginBottom: 20 }}
           allowClear
         />
-        <Button type="primary" onClick={() => setShowForm(true)}>新增规格型号</Button>
-        
-        <Button style={{float:'right'}} onClick={handleExport}>导出查询结果</Button>
+        <Button type="primary" onClick={() => setShowForm(true)}>
+          新增规格型号
+        </Button>
+
+        <Button style={{ float: 'right' }} onClick={handleExport}>
+          导出查询结果
+        </Button>
       </div>
 
-      <Table
-        dataSource={filteredSpecModels}
-        columns={columns}
-        loading={loading}
-        rowKey="id"
-        pagination={false}
-      />
+      <Table dataSource={filteredSpecModels} columns={columns} loading={loading} rowKey="id" pagination={false} />
 
       <Modal
         open={showForm}
@@ -205,11 +210,7 @@ const SpecModelForm: React.FC<SpecModelFormProps> = ({ initialData, onSave, onCa
       layout="vertical"
       onFinish={handleSubmit}
     >
-      <Form.Item
-        name="process_id"
-        label="选择工序"
-        rules={[{ required: true, message: '请选择工序！' }]}
-      >
+      <Form.Item name="process_id" label="选择工序" rules={[{ required: true, message: '请选择工序！' }]}>
         <Select placeholder="请选择工序">
           {processes.map((process) => (
             <Option key={process.id} value={process.id}>
@@ -219,27 +220,15 @@ const SpecModelForm: React.FC<SpecModelFormProps> = ({ initialData, onSave, onCa
         </Select>
       </Form.Item>
 
-      <Form.Item
-        name="name"
-        label="规格名称"
-        rules={[{ required: true, message: '请输入规格名称！' }]}
-      >
+      <Form.Item name="name" label="规格名称" rules={[{ required: true, message: '请输入规格名称！' }]}>
         <Input />
       </Form.Item>
 
-      <Form.Item
-        name="category"
-        label="分类"
-        rules={[{ required: true, message: '请输入分类！' }]}
-      >
+      <Form.Item name="category" label="分类" rules={[{ required: true, message: '请输入分类！' }]}>
         <Input />
       </Form.Item>
 
-      <Form.Item
-        name="price"
-        label="工价"
-        rules={[{ required: true, message: '请输入工价！' }]}
-      >
+      <Form.Item name="price" label="工价" rules={[{ required: true, message: '请输入工价！' }]}>
         <Input type="number" />
       </Form.Item>
 

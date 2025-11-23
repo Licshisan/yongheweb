@@ -1,4 +1,3 @@
-
 import request from '../utils/request';
 
 // WageLog 类型定义
@@ -42,7 +41,7 @@ export const getWagePriceByProcessAndSpec = async (processId: number, specModelI
 // 创建新的工资记录
 export const createWageLog = async (wageLogData: Omit<WageLog, 'id'>) => {
   try {
-    console.log('wageLogData:',wageLogData);
+    console.log('wageLogData:', wageLogData);
     const response = await request.post('/api/wage_logs/', wageLogData);
     return response.data; // 假设返回的是创建成功的工资记录
   } catch (error) {
@@ -121,4 +120,3 @@ export const getFilteredWageLogs = async (params: {
   const response = await request.get('/api/wage_logs/query', { params });
   return response.data;
 };
-
