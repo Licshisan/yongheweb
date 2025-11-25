@@ -24,12 +24,12 @@ const MenuList = () => {
     {
       key: "/worker",
       icon: <UserOutlined />,
-      label: <Link to="/worker">工人信息</Link>,
+      label: "工人信息",
       children: [
         {
-          key: "/worker",
+          key: "/worker/list",
           icon: <CiOutlined />,
-          label: <Link to="/worker">工人列表</Link>,
+          label: <Link to="/worker/list">工人列表</Link>,
         },
         {
           key: "/worker/create",
@@ -41,12 +41,12 @@ const MenuList = () => {
     {
       key: "/process",
       icon: <AppstoreOutlined />,
-      label: <Link to="/process">工序调整</Link>,
+      label: "工序调整",
       children: [
         {
-          key: "/process",
+          key: "/process/list",
           icon: <CiOutlined />,
-          label: <Link to="/process">工序列表</Link>,
+          label: <Link to="/process/list">工序列表</Link>,
         },
         {
           key: "/process/create",
@@ -58,7 +58,19 @@ const MenuList = () => {
     {
       key: "/spec-model",
       icon: <DollarOutlined />,
-      label: <Link to="/spec-model">规格工价</Link>,
+      label: "规格型号",
+      children: [
+        {
+          key: "/spec-model/list",
+          icon: <CiOutlined />,
+          label: <Link to="/spec-model/list">规格型号列表</Link>,
+        },
+        {
+          key: "/spec-model/create",
+          icon: <PlusOutlined />,
+          label: <Link to="/spec-model/create">创建规格型号</Link>,
+        },
+      ],
     },
     {
       key: "/wage_log",

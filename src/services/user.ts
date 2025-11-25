@@ -1,3 +1,4 @@
+import exp from "constants";
 import request, { ResponseData } from "../utils/request";
 
 interface User {
@@ -12,5 +13,10 @@ export async function login(username: string, password: string): Promise<Respons
 
 export async function register(username: string, password: string): Promise<ResponseData<User>> {
   const response = await request.post("/user/register", { username, password });
+  return response.data;
+}
+
+export async function getUserInfo(): Promise<ResponseData<User>> {
+  const response = await request.get("/user/info");
   return response.data;
 }

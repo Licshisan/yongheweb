@@ -65,7 +65,7 @@ const WorkerCreatePage: React.FC = () => {
         messageApi.success("新建工人成功");
       }
       setTimeout(() => {
-        navigate("/worker");
+        navigate("/worker/list");
       }, 500);
     } catch (error: any) {
       console.error("保存工人失败:", error);
@@ -75,7 +75,7 @@ const WorkerCreatePage: React.FC = () => {
 
   // 取消按钮处理
   const handleCancel = () => {
-    navigate("/worker");
+    navigate("/worker/list");
   };
 
   // 加载所有工序以供选择

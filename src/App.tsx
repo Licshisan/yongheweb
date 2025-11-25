@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import SpecModelPage from "./pages/SpecModelPage";
 import WageLogSearchPage from "./pages/WageLogSearchPage";
 import WageLogPage from "./pages/WageLogPage";
 import LoginPage from "./pages/LoginPage";
@@ -11,6 +10,8 @@ import WorkerListPage from "./pages/worker/list";
 import WorkerCreatePage from "./pages/worker/create";
 import ProcessListPage from "./pages/process/list";
 import ProcessCreatePage from "./pages/process/create";
+import SpecModelListPage from "./pages/spec-model/list";
+import SpecModelCreatePage from "./pages/spec-model/create";
 
 function App() {
   return (
@@ -22,12 +23,14 @@ function App() {
 
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/worker" element={<WorkerListPage />} />
+          <Route path="/worker/list" element={<WorkerListPage />} />
           <Route path="/worker/create" element={<WorkerCreatePage />} />
 
-          <Route path="/process" element={<ProcessListPage />} />
+          <Route path="/process/list" element={<ProcessListPage />} />
           <Route path="/process/create" element={<ProcessCreatePage />} />
-          <Route path="/spec-model" element={<SpecModelPage />} />
+
+          <Route path="/spec-model/list" element={<SpecModelListPage />} />
+          <Route path="/spec-model/create" element={<SpecModelCreatePage />} />
           <Route path="/wage_log" element={<WageLogPage />} />
           <Route path="/wage_log_check" element={<WageLogSearchPage />} />
           <Route path="/salary_import" element={<SalaryImportPage />} />

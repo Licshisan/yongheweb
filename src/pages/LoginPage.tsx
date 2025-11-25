@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Form, Input, Button, message, Flex, Typography } from "antd";
-import { login } from "../services/user";
-import { setToken } from "../utils/auth";
+import { login, getUserInfo } from "../services/user";
+import { getToken, setToken } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
+import { get } from "http";
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
@@ -29,11 +30,24 @@ const LoginPage = () => {
 
   // 检查重新登录
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get("relogin") === "1") {
-      messageApi.info("请重新登录");
-    }
-  }, [messageApi]);
+    const valid = async () => {
+      try {
+        if(getToken() == null){
+          return;
+        }
+        const result = await getUserInfo();
+        if (result.ok) {
+          navigate("/dashboard");
+        } else{
+          messageApi.info("请先登录");
+        }
+      } catch (error: any) {
+        console.error("验证登录状态失败:", error);
+        messageApi.error(error.response?.data?.msg || "验证登录状态失败");
+      }
+    };
+    valid();
+  }, [messageApi, navigate]);
 
   return (
     <>
