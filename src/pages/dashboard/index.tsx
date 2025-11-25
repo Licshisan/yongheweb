@@ -1,5 +1,5 @@
 import React from "react";
-import { Typography, Card, Button } from "antd";
+import { Typography, Card, Button, Flex, Space, Popconfirm } from "antd";
 import { useNavigate } from "react-router-dom";
 import { removeToken } from "../../utils/auth";
 
@@ -12,23 +12,30 @@ const DashboardPage: React.FC = () => {
   }
 
   return (
-    <>
-      <Card
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100%",
-        }}
-      >
-        <Typography.Title level={2} style={{ marginTop: -100 }}>
-          欢迎使用工人工资管理系统
-        </Typography.Title>
-        <Typography.Text type="secondary">登录成功，请通过左侧菜单选择功能</Typography.Text>
-        <Button onClick={onExit}>退出登录</Button>
-      </Card>
-    </>
+    <Card
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+      }}
+    >
+      <Typography.Title level={2} style={{ marginBottom: 16 }}>
+        欢迎使用工人工资管理系统
+      </Typography.Title>
+      <Space>
+        <Typography.Text type="secondary" style={{ marginBottom: 24 }}>
+          登录成功，请通过左侧菜单选择功能
+        </Typography.Text>
+        <Popconfirm title="确定退出登录吗？" onConfirm={onExit} okText="确定" cancelText="取消">
+          <Button type="link">
+            退出登录
+          </Button>
+        </Popconfirm>
+      </Space>
+    </Card>
   );
 };
 

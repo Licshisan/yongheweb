@@ -1,37 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Upload, Button, Table, message, Progress } from "antd";
+import { Upload, Button, Table, message, Progress, Space, Flex, Typography } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import * as XLSX from "xlsx";
-import { getSpecModels } from "../services/specModel";
-import { getWorkers } from "../services/worker";
-import { batchCreateWageLogs } from "../services/wageLogs";
-import { getProcesses } from "../services/process";
+import { getSpecModels, SpecModel } from "../../services/specModel";
+import { getWorkers, Worker } from "../../services/worker";
+import { batchCreateWageLogs } from "../../services/wageLogs";
+import { getProcesses, Process } from "../../services/process";
 
-interface SpecModel {
-  id: number;
-  process_name: string;
-  name: string;
-  price: string | number;
-  process_id: number;
-}
-
-interface Worker {
-  id: number;
-  name: string;
-  process_id: number;
-  process_name: string;
-}
-
-interface Process {
-  id: number;
-  name: string;
-  description: string;
-}
-
-const styles = `
-  .row-green { background-color: #d9f7be !important; }
-  .row-red { background-color: #ffd6d6 !important; }
-`;
 
 const SalaryImportPage: React.FC = () => {
   const [data, setData] = useState<any[]>([]);
@@ -45,14 +20,10 @@ const SalaryImportPage: React.FC = () => {
   useEffect(() => {
     const loadAllWorkers = async () => {
       try {
-        const res = await getWorkers();
-        const workersWithProcess = res.data.workers.map((w: any) => ({
-          id: w.id,
-          name: w.name,
-          process_id: w.process?.id || 0,
-          process_name: w.process?.name || "",
-        }));
-        setAllWorkers(workersWithProcess);
+        const result = await getWorkers();
+        if(result.data){
+          setAllWorkers(result.data);
+        }
       } catch (error) {
         message.error("加载工人失败");
       }
@@ -96,7 +67,7 @@ const SalaryImportPage: React.FC = () => {
 
   // 查找工价
   const findPrice = (processName: string, specName: string): number => {
-    const item = allSpecModels.find((spec) => spec.process_name === processName && spec.name === specName);
+    const item = allSpecModels.find((spec) => spec?.process?.name === processName && spec.name === specName);
     return item ? Number(item.price) : 0;
   };
 
@@ -189,14 +160,14 @@ const SalaryImportPage: React.FC = () => {
       // 建立映射，加快查找
       const workerMap = Object.fromEntries(allWorkers.map((w) => [w.name, w.id]));
       const specMap = Object.fromEntries(
-        allSpecModels.map((s) => [`${s.process_name}_${s.name}`, { id: s.id, process_id: s.process_id }]),
+        allSpecModels.map((s) => [`${s.process?.name}_${s.name}`, { id: s.id, process_id: s.process_id }]),
       );
 
       for (let i = 0; i < data.length; i += batchSize) {
         const chunk = data.slice(i, i + batchSize).map((row) => ({
           worker_id: allWorkers.find((w) => w.name === row["工人"])!.id, // 用 ! 确保非 null
           process_id: processes.find((s) => s.name === row["工序"])!.id!,
-          spec_model_id: allSpecModels.find((s) => s.process_name === row["工序"] && s.name === row["规格型号"])!.id!,
+          spec_model_id: allSpecModels.find((s) => s.process?.name === row["工序"] && s.name === row["规格型号"])!.id!,
           date: row["日期"],
           actual_price: Number(row["单价"]),
           quantity: Number(row["数量"]),
@@ -228,37 +199,26 @@ const SalaryImportPage: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <style>{styles}</style>
-      <h2>薪资导入（前台解析+批量导入）</h2>
+    <>
+      <Typography.Title level={2}>薪资导入（前台解析+批量导入）</Typography.Title>
 
-      {/* 顶部按钮区域：左右分布 */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          margin: "10px 0",
-        }}
-      >
-        {/* 左侧：选择文件按钮 */}
+      <Flex justify="space-between">
         <Upload beforeUpload={handleFile} accept=".xlsx,.xls" maxCount={1} showUploadList={false}>
           <Button icon={<UploadOutlined />}>选择 Excel 文件</Button>
         </Upload>
 
-        {/* 右侧：三个操作按钮 */}
-        <div>
-          <Button type="primary" onClick={checkWorkers} style={{ marginRight: 10 }}>
+        <Space>
+          <Button type="primary" onClick={checkWorkers}>
             核查人员
           </Button>
-          <Button type="primary" onClick={checkPriceAndCompute} style={{ marginRight: 10 }}>
+          <Button type="primary" onClick={checkPriceAndCompute}>
             核查单价并计算薪资
           </Button>
           <Button type="primary" onClick={importToDB}>
             批量导入到数据库
           </Button>
-        </div>
-      </div>
+        </Space>
+      </Flex>
 
       {progress > 0 && <Progress percent={progress} />}
 
@@ -269,7 +229,7 @@ const SalaryImportPage: React.FC = () => {
         rowClassName={(record) => (record._workerMatched === false || record._priceMatched === false ? "row-red" : "")}
         style={{ marginTop: 20 }}
       />
-    </div>
+    </>
   );
 };
 

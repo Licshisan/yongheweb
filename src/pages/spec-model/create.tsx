@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Button, Col, Form, Input, Row, Select, Typography, message } from "antd";
+import { Button, Col, Form, Input, InputNumber, Row, Select, Typography, message } from "antd";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { createSpecModel, getSpecModel, SpecModel, updateSpecModel } from "../../services/specModel";
 import { getProcesses } from "../../services/process";
 
-const { Option } = Select;
-const { Title } = Typography;
 
 const SpecModelCreatePage: React.FC = () => {
   const [form] = Form.useForm();
@@ -90,27 +88,23 @@ const SpecModelCreatePage: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
+    <>
       {contextHolder}
-      <Title level={2}>{isEditMode ? "编辑规格型号" : "新增规格型号"}</Title>
+      <Typography.Title level={2}>{isEditMode ? "编辑规格型号" : "新增规格型号"}</Typography.Title>
 
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-      >
+      <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Form.Item name="name" label="规格名称" rules={[{ required: true, message: "请输入规格名称！" }]}>
+          <Input placeholder="请输入规格名称" />
+        </Form.Item>
+
         <Form.Item name="process_id" label="选择工序" rules={[{ required: true, message: "请选择工序！" }]}>
           <Select placeholder="请选择工序">
             {processes.map((process) => (
-              <Option key={process.id} value={process.id}>
+              <Select.Option key={process.id} value={process.id}>
                 {process.name}
-              </Option>
+              </Select.Option>
             ))}
           </Select>
-        </Form.Item>
-
-        <Form.Item name="name" label="规格名称" rules={[{ required: true, message: "请输入规格名称！" }]}>
-          <Input placeholder="请输入规格名称" />
         </Form.Item>
 
         <Form.Item name="category" label="分类" rules={[{ required: true, message: "请输入分类！" }]}>
@@ -118,7 +112,7 @@ const SpecModelCreatePage: React.FC = () => {
         </Form.Item>
 
         <Form.Item name="price" label="工价" rules={[{ required: true, message: "请输入工价！" }]}>
-          <Input type="number" placeholder="请输入工价" />
+          <InputNumber prefix="￥" style={{ width: "100%" }} />
         </Form.Item>
 
         <Row gutter={24} justify="end">
@@ -132,7 +126,7 @@ const SpecModelCreatePage: React.FC = () => {
           </Col>
         </Row>
       </Form>
-    </div>
+    </>
   );
 };
 

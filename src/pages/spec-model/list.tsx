@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Button, Input, Table, Typography, Popconfirm, TableColumnsType, message } from "antd";
 import { getSpecModels,  deleteSpecModel, SpecModel } from "../../services/specModel";
-import { getProcesses } from "../../services/process";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useNavigate } from "react-router-dom";
+import { Process } from "../../services/process";
 
 const SpecModelListPage: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
   const [specModels, setSpecModels] = useState<SpecModel[]>([]);
-  const [processes, setProcesses] = useState<{ id: number; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
@@ -19,6 +18,7 @@ const SpecModelListPage: React.FC = () => {
       setLoading(true);
       const result = await getSpecModels();
       if (result.data) {
+        console.log(result.data);
         const filteredSpecModels = result.data.filter((specModel: SpecModel) =>
           specModel.name.toLowerCase().includes(search.toLowerCase()),
         );
@@ -29,18 +29,6 @@ const SpecModelListPage: React.FC = () => {
       messageApi.warning(error.response?.data?.msg || "加载规格型号失败");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const loadProcesses = async () => {
-    try {
-      const result = await getProcesses();
-      if (result.data) {
-        setProcesses(result.data);
-      }
-    } catch (error: any) {
-      console.error("加载工序失败:", error);
-      messageApi.warning(error.response?.data?.msg || "加载工序失败");
     }
   };
 
@@ -55,12 +43,11 @@ const SpecModelListPage: React.FC = () => {
       specModel.name.toLowerCase().includes(search.toLowerCase()),
     );
     const exportData = filteredSpecModels.map((spec) => {
-      const process = processes.find((p) => p.id === spec.process_id);
       return {
         规格名称: spec.name,
+        工序: spec.process?.name || "-",
         分类: spec.category,
         工价: spec.price,
-        工序: process ? process.name : "-",
       };
     });
 
@@ -92,7 +79,6 @@ const SpecModelListPage: React.FC = () => {
 
   useEffect(() => {
     loadSpecModels();
-    loadProcesses();
   }, []);
 
   const columns: TableColumnsType<SpecModel> = [
@@ -102,23 +88,20 @@ const SpecModelListPage: React.FC = () => {
       key: "name",
     },
     {
+      title: "工序",
+      dataIndex: "process",
+      key: "process",
+      render: (process: Process) => process?.name,
+    },
+    {
       title: "分类",
       dataIndex: "category",
       key: "category",
     },
     {
-      title: "价格",
+      title: "工价",
       dataIndex: "price",
       key: "price",
-    },
-    {
-      title: "工序",
-      dataIndex: "process_id",
-      key: "process_id",
-      render: (processId: number) => {
-        const process = processes.find((p) => p.id === processId);
-        return process ? process.name : "-";
-      },
     },
     {
       title: "操作",

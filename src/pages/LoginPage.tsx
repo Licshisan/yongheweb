@@ -3,7 +3,6 @@ import { Form, Input, Button, message, Flex, Typography } from "antd";
 import { login, getUserInfo } from "../services/user";
 import { getToken, setToken } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
-import { get } from "http";
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);

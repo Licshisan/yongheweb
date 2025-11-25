@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { ProTable } from "@ant-design/pro-components";
 import { Form, DatePicker, Select, Button, SelectProps, Space, Statistic } from "antd";
 import dayjs from "dayjs";
-import { getWorkers } from "../services/worker";
-import { getProcesses } from "../services/process";
-import { getFilteredWageLogs } from "../services/wageLogs";
+import { getWorkers } from "../../services/worker";
+import { getProcesses } from "../../services/process";
+import { getFilteredWageLogs } from "../../services/wageLogs";
 
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";

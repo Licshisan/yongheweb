@@ -1,4 +1,5 @@
 import request, { ResponseData } from "../utils/request";
+import { Process } from "./process";
 
 export interface Worker {
   id: number;
@@ -10,6 +11,7 @@ export interface Worker {
   entry_date?: string;
   leave_date?: string;
   status?: string;
+  process?: Process
 }
 
 export async function createWorker(worker: Partial<Worker>): Promise<ResponseData<Worker>> {
