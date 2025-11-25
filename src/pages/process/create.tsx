@@ -50,7 +50,7 @@ const ProcessCreatePage: React.FC = () => {
         messageApi.success("工序创建成功！");
       }
       setTimeout(() => {
-        navigate("/process");
+        navigate("/process/list");
       }, 500);
     } catch (error: any) {
       console.error("保存工序失败:", error);
@@ -60,7 +60,7 @@ const ProcessCreatePage: React.FC = () => {
 
   // 取消按钮处理
   const handleCancel = () => {
-    navigate("/process");
+    navigate("/process/list");
   };
 
   return (

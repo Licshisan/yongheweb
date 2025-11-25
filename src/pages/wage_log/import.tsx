@@ -50,14 +50,10 @@ const SalaryImportPage: React.FC = () => {
   useEffect(() => {
     const loadAllSpecModels = async () => {
       try {
-        const res = await getSpecModels();
-        const specs = res.specModels.map((s: any) => ({
-          id: s.id,
-          process_name: s.process_name,
-          name: s.name,
-          price: s.price,
-        }));
-        setAllSpecModels(specs);
+        const result = await getSpecModels();
+        if(result.data){
+          setAllSpecModels(result.data);
+        }
       } catch (error) {
         message.error("加载规格工价失败");
       }

@@ -1,10 +1,13 @@
 import request, { ResponseData } from "../utils/request";
-
+import { SpecModel } from "./specModel";
+import { Worker } from './worker'
 // 工序接口
 export interface Process {
   id: number;
   name: string;
   description: string;
+  workers?: Worker[];
+  spec_models?: SpecModel[]
 }
 
 // 查找单个工序
@@ -14,8 +17,8 @@ export async function getProcess(id: number): Promise<ResponseData<Process>> {
 };
 
 // 获取所有工序
-export async function getProcesses(): Promise<ResponseData<Process[]>> {
-  const response = await request.get("/process/");
+export async function getProcesses(params?: {worker_id:number}): Promise<ResponseData<Process[]>> {
+  const response = await request.get("/process/", { params });
   return response.data;
 
 };

@@ -1,4 +1,7 @@
+import { SpecModel } from './specModel';
 import request from "../utils/request";
+import { Process } from "./process";
+import { Worker } from './worker'
 
 // WageLog 类型定义
 export interface WageLog {
@@ -12,14 +15,17 @@ export interface WageLog {
   quantity: number;
   total_wage: number;
   remark?: string;
+  worker?: Worker;
+  process?: Process;
+  spec_model?: SpecModel;
   created_at?: string;
   updated_at?: string;
 }
 
 // 获取所有工资记录
-export const getWageLogs = async () => {
-  const response = await request.get("/wage_log/");
-  return response.data; // 假设返回的数据包含 'wage_logs' 字段
+export const getWageLogs = async (date?: string) => {
+  const response = await request.get("/wage_log/", { params: {date}});
+  return response.data;
 };
 
 // 获取指定工序和规格型号的工价
@@ -31,7 +37,6 @@ export const getWagePriceByProcessAndSpec = async (processId: number, specModelI
 
 // 创建新的工资记录
 export const createWageLog = async (wageLogData: Omit<WageLog, "id">) => {
-  console.log("wageLogData:", wageLogData);
   const response = await request.post("/wage_log/", wageLogData);
   return response.data; // 假设返回的是创建成功的工资记录
 };

@@ -18,7 +18,6 @@ const SpecModelListPage: React.FC = () => {
       setLoading(true);
       const result = await getSpecModels();
       if (result.data) {
-        console.log(result.data);
         const filteredSpecModels = result.data.filter((specModel: SpecModel) =>
           specModel.name.toLowerCase().includes(search.toLowerCase()),
         );
