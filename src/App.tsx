@@ -1,42 +1,43 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Layout, theme } from 'antd';
-import WorkerPage from './pages/workers';
-import ProcessPage from './pages/ProcessPage';
-import SpecModelPage from './pages/SpecModelPage';
-import Sidebar from './components/Sidebar';
-import WageLogSearchPage from './pages/WageLogSearchPage';
-import WageLogPage from './pages/WageLogPage';
-import LoginPage from './pages/LoginPage';
-import SalaryImportPage from './pages/SalaryImportPage';
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import Register from "./pages/Register";
+import MainLayout from "./components/MainLayout";
+import DashboardPage from "./pages/dashboard";
+import WorkerListPage from "./pages/worker/list";
+import WorkerCreatePage from "./pages/worker/create";
+import ProcessListPage from "./pages/process/list";
+import ProcessCreatePage from "./pages/process/create";
+import SpecModelListPage from "./pages/spec-model/list";
+import SpecModelCreatePage from "./pages/spec-model/create";
 
-const {Content, Sider } = Layout;
+import WageLogListPage from "./pages/wage_log/list"
+import WageLogCreatePage from "./pages/wage_log/create";
+import WageLogImportPage from "./pages/wage_log/import";
 
 function App() {
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken();
-
   return (
     <Router>
-      <Layout style={{ minHeight: '100vh' }}>
-        <Sider width={200}>
-          <Sidebar />
-        </Sider>
-        <Layout>
-          
-          <Content style={{ margin: '16px', background: colorBgContainer, padding: 24 }}>
-            <Routes>
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/workers" element={<WorkerPage />} />
-              <Route path="/processes" element={<ProcessPage />} />
-              <Route path="/spec-models" element={<SpecModelPage />} />
-              <Route path="/wage_logs" element={<WageLogPage />} />
-              <Route path="/wage_logs_check" element={<WageLogSearchPage />} />
-              <Route path="/salary_import" element={<SalaryImportPage />} />
-            </Routes>
-          </Content>
-        </Layout>
-      </Layout>
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<Register />} />
+
+        <Route element={<MainLayout />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/worker/list" element={<WorkerListPage />} />
+          <Route path="/worker/create" element={<WorkerCreatePage />} />
+
+          <Route path="/process/list" element={<ProcessListPage />} />
+          <Route path="/process/create" element={<ProcessCreatePage />} />
+
+          <Route path="/spec-model/list" element={<SpecModelListPage />} />
+          <Route path="/spec-model/create" element={<SpecModelCreatePage />} />
+
+          <Route path="/wage_log/list" element={<WageLogListPage />} />
+          <Route path="/wage_log/create" element={<WageLogCreatePage />} />
+          <Route path="/wage_log/import" element={<WageLogImportPage />} />
+        </Route>
+      </Routes>
     </Router>
   );
 }
